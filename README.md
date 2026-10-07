@@ -19,7 +19,7 @@ a data importer, and manager analytics with CSV and PDF export.
 ## 3. Get the code *(A)*
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/nurulhasan2k/library-platform.git
 cd LibraryPlatform
 git checkout main     # the branch to use for assessment
 ```
