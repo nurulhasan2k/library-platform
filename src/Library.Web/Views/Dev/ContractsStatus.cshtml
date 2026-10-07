@@ -1,0 +1,20 @@
+@model List<Library.Web.Controllers.ContractRow>
+@{
+    ViewData["Title"] = "Shared services status";
+}
+<h1>Shared services status</h1>
+<p>Development only. A <strong>stub</strong> is a safe placeholder; replace it by registering the real service in <code>Program.cs</code>.</p>
+<table class="table">
+  <thead><tr><th>Contract</th><th>Owner</th><th>Implementation</th><th>State</th></tr></thead>
+  <tbody>
+  @foreach (var r in Model)
+  {
+    <tr>
+      <td>@r.Contract</td>
+      <td>@r.Owner</td>
+      <td><code>@r.Implementation</code></td>
+      <td class="@(r.IsStub ? "state-stub" : "state-real")">@(r.IsStub ? "Stub" : "Real")</td>
+    </tr>
+  }
+  </tbody>
+</table>

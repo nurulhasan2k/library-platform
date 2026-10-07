@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Library.Core</RootNamespace>
+    <AssemblyName>Library.Core</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Only the logging and DI abstractions: they ship with the .NET SDK, nothing to download. -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+</Project>

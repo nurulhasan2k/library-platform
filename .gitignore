@@ -1,0 +1,33 @@
+# Build output
+bin/
+obj/
+publish/
+*.dll
+*.pdb
+
+# Visual Studio / Rider / VS Code
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+*.DotSettings.user
+
+# Local database and generated files (never commit these)
+data/*
+!data/.gitkeep
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+exports/
+
+# Secrets and local settings (use `dotnet user-secrets` instead)
+appsettings.Local.json
+appsettings.*.Local.json
+secrets.json
+.env
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,12 @@
+@{
+    ViewData["Title"] = "Home";
+}
+<h1>Library Platform</h1>
+<p>
+  The multi-branch library platform is under construction. The foundation (database, roles, branches and lending)
+  is being ported from the Assignment 2 system and will replace this page.
+</p>
+@if (ViewContext.HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment())
+{
+  <p><a href="/dev/contracts">Developer view: which shared services are real or still stubs</a></p>
+}
