@@ -1,0 +1,57 @@
+@model KioskAccountVm
+<div class="kcenter wide">
+  <h1>My account</h1>
+  <p class="klead">@Model.PatronName</p>
+
+  <h2>My loans</h2>
+  @if (Model.Loans.Count == 0)
+  {
+    <p class="ksmall">You have no items on loan.</p>
+  }
+  else
+  {
+    <table class="ktable">
+      <thead><tr><th>Item</th><th>Due date</th><th>Days left</th><th>Fine</th></tr></thead>
+      <tbody>
+      @foreach (var l in Model.Loans)
+      {
+        <tr class="@(l.DaysLeft < 0 ? "overdue" : "")">
+          <td>@l.ItemName</td>
+          <td>@l.DueOn.ToString("d MMM yyyy")</td>
+          <td>@(l.DaysLeft < 0 ? "Overdue by " + (-l.DaysLeft) + " day(s)" : l.DaysLeft + " day(s)")</td>
+          <td>$@l.Fine.ToString("0.00")</td>
+        </tr>
+      }
+      </tbody>
+    </table>
+  }
+  <p class="klead">Fines owed: <b>$@Model.FinesOwed.ToString("0.00")</b></p>
+
+  <h2>My holds</h2>
+  @if (Model.Holds.Count == 0)
+  {
+    <p class="ksmall">You have no holds. Ask at the desk if you want to wait for a borrowed item.</p>
+  }
+  else
+  {
+    <table class="ktable">
+      <thead><tr><th>Item</th><th>Status</th><th>Queue position</th><th>Ready until</th></tr></thead>
+      <tbody>
+      @foreach (var h in Model.Holds)
+      {
+        <tr>
+          <td>@h.ItemName</td>
+          <td>@(h.Status == ReservationStatus.Ready ? "Ready to borrow" : "Waiting")</td>
+          <td>@h.Position</td>
+          <td>@(h.ExpiresAt is { } e ? e.ToString("d MMM yyyy") : "-")</td>
+        </tr>
+      }
+      </tbody>
+    </table>
+  }
+
+  <div class="krow">
+    <a class="kbtn" href="/kiosk/home">Back</a>
+    <a class="kbtn grey" href="/kiosk/finish">Finish</a>
+  </div>
+</div>

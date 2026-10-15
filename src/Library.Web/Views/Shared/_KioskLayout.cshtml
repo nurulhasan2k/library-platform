@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Library Kiosk</title>
+  <link rel="stylesheet" href="~/css/kiosk.css" asp-append-version="true" />
+</head>
+<body class="kiosk">
+  <header class="kiosk-top">
+    <span class="kiosk-title">@ViewData["BranchName"] Kiosk</span>
+    @if (ViewData["Idle"] is int idleSeconds)
+    {
+      <span class="kiosk-idle">Session ends in <b id="idle-count">@idleSeconds</b> s</span>
+      <a class="kbtn small" href="/kiosk/finish">Finish</a>
+    }
+  </header>
+  <main class="kiosk-main">
+    @RenderBody()
+  </main>
+  <a class="staff-exit" href="/" title="Staff exit">staff</a>
+  @if (ViewData["Idle"] is int idleTotal)
+  {
+    <script>
+      (function () {
+        var total = @idleTotal;
+        var left = total;
+        var counter = document.getElementById('idle-count');
+        function reset() { left = total; if (counter) counter.textContent = left; }
+        ['click', 'touchstart', 'keydown', 'pointermove'].forEach(function (name) {
+          document.addEventListener(name, reset, { passive: true });
+        });
+        setInterval(function () {
+          left--;
+          if (counter) counter.textContent = left;
+          if (left <= 0) { window.location = '/kiosk/finish'; }
+        }, 1000);
+      })();
+    </script>
+  }
+</body>
+</html>

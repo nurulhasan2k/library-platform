@@ -1,0 +1,90 @@
+@model HoldsVm
+@{
+    ViewData["Title"] = "Holds and queues";
+    var msg = TempData["Msg"] as string;
+    var err = TempData["Err"] as string;
+}
+<partial name="_StaffNav" />
+<h1>Holds and queues</h1>
+<p>Place a hold only on an item that is borrowed or damaged. Return a borrowed item to see the next person get notified.</p>
+
+@if (!string.IsNullOrEmpty(msg)) { <p class="flash">@msg</p> }
+@if (!string.IsNullOrEmpty(err)) { <p class="flash error">@err</p> }
+
+<table class="data">
+  <thead><tr><th>Item</th><th>Status</th><th>Queue</th><th>Actions</th></tr></thead>
+  <tbody>
+  @foreach (var r in Model.Rows)
+  {
+    <tr>
+      <td><strong>@r.Item.Name</strong><br /><code>@r.Item.Code</code></td>
+      <td>
+        @r.Item.Status
+        @if (r.LoanHolder is not null)
+        {
+          <br /><span class="small">Borrowed by @r.LoanHolder, due @(r.DueOn?.ToString("d MMM yyyy"))</span>
+        }
+      </td>
+      <td>
+        @if (r.Queue.Count == 0)
+        {
+          <span class="small">No holds</span>
+        }
+        else
+        {
+          <ol class="queue">
+          @foreach (var q in r.Queue)
+          {
+            <li>
+              @q.BorrowerName (@(q.Status == ReservationStatus.Ready ? "Ready until " + (q.ExpiresAt?.ToString("d MMM yyyy") ?? "?") : "Waiting"))
+              <form method="post" asp-controller="Holds" asp-action="Cancel" class="inline">
+                <input type="hidden" name="reservationId" value="@q.ReservationId" />
+                <input type="hidden" name="borrowerId" value="@q.BorrowerId" />
+                <button class="btn small">Cancel</button>
+              </form>
+            </li>
+          }
+          </ol>
+        }
+      </td>
+      <td>
+        @if (r.Item.Status == ItemStatus.Borrowed || r.Item.Status == ItemStatus.Damaged)
+        {
+          <form method="post" asp-controller="Holds" asp-action="Place" class="inline">
+            <input type="hidden" name="itemId" value="@r.Item.Id" />
+            <select name="borrowerId">
+              @foreach (var p in Model.Patrons) { <option value="@p.Id">@p.Name</option> }
+            </select>
+            <button class="btn">Place hold</button>
+          </form>
+        }
+        @if (r.Item.Status == ItemStatus.Borrowed)
+        {
+          <form method="post" asp-controller="Holds" asp-action="ReturnItem" class="inline">
+            <input type="hidden" name="code" value="@r.Item.Code" />
+            <label><input type="checkbox" name="damaged" value="true" /> damaged</label>
+            <button class="btn primary">Return item</button>
+          </form>
+        }
+        @if (r.Item.Status == ItemStatus.Available)
+        {
+          <form method="post" asp-controller="Holds" asp-action="Borrow" class="inline">
+            <input type="hidden" name="code" value="@r.Item.Code" />
+            <select name="borrowerId">
+              @foreach (var p in Model.Patrons) { <option value="@p.Id">@p.Name</option> }
+            </select>
+            <button class="btn">Borrow at desk</button>
+          </form>
+        }
+        @if (r.Item.Status == ItemStatus.Damaged)
+        {
+          <form method="post" asp-controller="Holds" asp-action="MarkAvailable" class="inline">
+            <input type="hidden" name="itemId" value="@r.Item.Id" />
+            <button class="btn">Mark available (repaired)</button>
+          </form>
+        }
+      </td>
+    </tr>
+  }
+  </tbody>
+</table>

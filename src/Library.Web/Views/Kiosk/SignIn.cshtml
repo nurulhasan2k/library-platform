@@ -1,0 +1,48 @@
+@{
+    var error = ViewData["Error"] as string;
+}
+<div class="kcenter">
+  <h1>Sign in</h1>
+  @if (!string.IsNullOrEmpty(error))
+  {
+    <p class="kerror">@error</p>
+  }
+  <form method="post" asp-controller="Kiosk" asp-action="SignIn" autocomplete="off">
+    <label class="klabel" for="cardNumber">Library card number</label>
+    <input class="kinput" id="cardNumber" name="cardNumber" inputmode="numeric" autofocus />
+    <label class="klabel" for="pin">PIN (4 digits)</label>
+    <input class="kinput" id="pin" name="pin" type="password" inputmode="numeric" maxlength="4" />
+
+    <div class="keypad">
+      @foreach (var d in new[] { "1", "2", "3", "4", "5", "6", "7", "8", "9" })
+      {
+        <button type="button" class="key" data-k="@d">@d</button>
+      }
+      <button type="button" class="key" data-k="clear">Clear</button>
+      <button type="button" class="key" data-k="0">0</button>
+      <button type="button" class="key" data-k="back">Back</button>
+    </div>
+
+    <div class="krow">
+      <button type="submit" class="kbtn big">Sign in</button>
+      <a class="kbtn grey big" href="/kiosk">Cancel</a>
+    </div>
+  </form>
+</div>
+<script>
+  (function () {
+    var card = document.getElementById('cardNumber');
+    var pin = document.getElementById('pin');
+    var active = card;
+    card.addEventListener('focus', function () { active = card; });
+    pin.addEventListener('focus', function () { active = pin; });
+    document.querySelectorAll('.key').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var k = b.getAttribute('data-k');
+        if (k === 'clear') { active.value = ''; }
+        else if (k === 'back') { active.value = active.value.slice(0, -1); }
+        else if (!active.maxLength || active.maxLength < 0 || active.value.length < active.maxLength) { active.value += k; }
+      });
+    });
+  })();
+</script>
