@@ -16,8 +16,10 @@ public static class ApiServiceCollectionExtensions
         services.AddOptions<ApiOptions>()
             .Bind(configuration.GetSection(ApiOptions.Section))
             .Validate(options => options.RateLimitPerMinute > 0, "API rate limit must be greater than zero.")
+            .Validate(options => options.MaxPageSize > 0, "API maximum page size must be greater than zero.")
             .ValidateOnStart();
         services.AddControllers(options => options.Filters.Add<ApiProblemDetailsFilter>());
+        services.AddScoped<Library.Core.PublicCatalogue.PublicItemService>();
         services.AddCors(options => options.AddPolicy(CorsPolicy, policy => policy
             .AllowAnyOrigin()
             .WithMethods("GET", "HEAD", "OPTIONS")

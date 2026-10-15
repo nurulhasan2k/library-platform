@@ -24,10 +24,10 @@ internal sealed class ApiProblemDetailsFilter : IAlwaysRunResultFilter
             status.Value >= 500 ? null : original?.Detail);
         if (original is ValidationProblemDetails validation)
             problem.Extensions["errors"] = validation.Errors;
-        context.Result = new ObjectResult(problem)
+        context.Result = new JsonResult(problem)
         {
             StatusCode = status,
-            ContentTypes = { "application/problem+json" }
+            ContentType = "application/problem+json"
         };
     }
 
