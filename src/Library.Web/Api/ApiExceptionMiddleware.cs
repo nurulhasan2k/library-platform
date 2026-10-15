@@ -8,9 +8,16 @@ internal sealed class ApiExceptionMiddleware(RequestDelegate next, ILogger<ApiEx
         {
             await next(context);
         }
-        catch (Exception exception) when (!context.Response.HasStarted)
+        catch (Exception exception)
         {
-            logger.LogError(exception, "API request failed. Trace identifier: {TraceId}", context.TraceIdentifier);
+            // Exception messages may contain request headers or configuration values.
+            logger.LogError("API request failed ({ExceptionType}). Trace identifier: {TraceId}",
+                exception.GetType().Name, context.TraceIdentifier);
+            if (context.Response.HasStarted)
+            {
+                context.Abort();
+                return;
+            }
             context.Response.Clear();
             await ApiProblems.WriteAsync(context, 500);
         }

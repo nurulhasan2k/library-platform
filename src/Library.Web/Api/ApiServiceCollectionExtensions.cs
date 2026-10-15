@@ -30,15 +30,9 @@ public static class ApiServiceCollectionExtensions
         services.AddOptions<RateLimiterOptions>().Configure<IOptions<ApiOptions>>((options, api) =>
         {
             options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
-                RateLimitPartition.GetFixedWindowLimiter(
+                RateLimitPartition.Get(
                     context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
-                    _ => new FixedWindowRateLimiterOptions
-                    {
-                        PermitLimit = api.Value.RateLimitPerMinute,
-                        Window = TimeSpan.FromMinutes(1),
-                        QueueLimit = 0,
-                        AutoReplenishment = true
-                    }));
+                    _ => new ApiWindowLimiter(api.Value.RateLimitPerMinute)));
             options.OnRejected = async (context, ct) =>
             {
                 var seconds = context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter)
@@ -55,6 +49,7 @@ public static class ApiServiceCollectionExtensions
     {
         app.UseWhen(context => context.Request.Path.StartsWithSegments("/api"), api =>
         {
+            api.UseMiddleware<ApiHeadMiddleware>();
             api.UseMiddleware<ApiCorsHeadersMiddleware>();
             api.UseMiddleware<ApiExceptionMiddleware>();
             api.UseStatusCodePages(context => ApiProblems.WriteAsync(context.HttpContext,
