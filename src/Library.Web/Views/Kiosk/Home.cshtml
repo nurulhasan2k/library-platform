@@ -1,0 +1,14 @@
+@{
+    var name = ViewData["PatronName"] as string;
+}
+<div class="kcenter">
+  <h1>Hello, @name</h1>
+  <p class="klead">What would you like to do?</p>
+  <div class="krow">
+    <a class="kbtn big" href="/kiosk/checkout">Check out items</a>
+    <a class="kbtn big" href="/kiosk/account">My account</a>
+  </div>
+  <div class="krow">
+    <a class="kbtn grey big" href="/kiosk/finish">Finish</a>
+  </div>
+</div>

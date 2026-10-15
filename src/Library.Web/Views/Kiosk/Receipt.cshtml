@@ -1,0 +1,16 @@
+@model KioskReceiptVm
+<div class="kcenter">
+  <h1>Your receipt</h1>
+  <p class="klead">Thank you, @Model.PatronName. Branch: @Model.BranchName</p>
+  <table class="ktable">
+    <thead><tr><th>Item</th><th>Borrowed</th><th>Due date</th></tr></thead>
+    <tbody>
+    @foreach (var i in Model.Items)
+    {
+      <tr><td>@i.ItemName</td><td>@i.BorrowedOn.ToString("d MMM yyyy")</td><td>@i.DueOn.ToString("d MMM yyyy")</td></tr>
+    }
+    </tbody>
+  </table>
+  <p class="klead">Total items: @Model.Items.Count</p>
+  <a class="kbtn big" href="/kiosk">Done</a>
+</div>

@@ -1,0 +1,38 @@
+@model KioskCheckoutVm
+<div class="kcenter">
+  <h1>Check out items</h1>
+  <p class="klead">Scan the code on the item, or type it, then press Borrow.</p>
+
+  @if (!string.IsNullOrEmpty(Model.Error))
+  {
+    <p class="kerror">@Model.Error</p>
+  }
+  @if (!string.IsNullOrEmpty(Model.LastOk))
+  {
+    <p class="kok">Borrowed: @Model.LastOk</p>
+  }
+
+  <form method="post" asp-controller="Kiosk" asp-action="Checkout" autocomplete="off">
+    <input class="kinput" name="code" placeholder="Library code, for example LIB-0004" autofocus />
+    <button type="submit" class="kbtn big">Borrow</button>
+  </form>
+
+  @if (Model.Items.Count > 0)
+  {
+    <table class="ktable">
+      <thead><tr><th>Item</th><th>Due date</th></tr></thead>
+      <tbody>
+      @foreach (var i in Model.Items)
+      {
+        <tr><td>@i.ItemName</td><td>@i.DueOn.ToString("d MMM yyyy")</td></tr>
+      }
+      </tbody>
+    </table>
+    <div class="krow">
+      <a class="kbtn big" href="/kiosk/receipt">Finish and get receipt</a>
+    </div>
+  }
+  <div class="krow">
+    <a class="kbtn grey" href="/kiosk/home">Back</a>
+  </div>
+</div>

@@ -1,0 +1,66 @@
+@model MyHoldsVm
+@{
+    ViewData["Title"] = "My holds";
+    var msg = TempData["Msg"] as string;
+    var err = TempData["Err"] as string;
+}
+<link rel="stylesheet" href="~/css/features.css" asp-append-version="true" />
+<h1>My holds</h1>
+<p>A hold lets you wait in line for an item that someone else has borrowed. When it is your turn, we tell you and keep the item for you.</p>
+
+@if (!string.IsNullOrEmpty(msg)) { <p class="flash">@msg</p> }
+@if (!string.IsNullOrEmpty(err)) { <p class="flash error">@err</p> }
+
+@if (Model.PatronName is null)
+{
+  <section class="panel">
+    <h2>Sign in</h2>
+    <form method="post" asp-controller="MyHolds" asp-action="SignIn" autocomplete="off">
+      <p><label>Library card number<br /><input name="cardNumber" inputmode="numeric" /></label></p>
+      <p><label>PIN (4 digits)<br /><input name="pin" type="password" inputmode="numeric" maxlength="4" /></label></p>
+      <button class="btn primary">Sign in</button>
+    </form>
+  </section>
+}
+else
+{
+  <p>Signed in as <strong>@Model.PatronName</strong>. <a href="/my-holds/signout">Sign out</a></p>
+
+  <section class="panel">
+    <h2>Place a hold</h2>
+    <p class="small">You can place a hold only on an item that is borrowed or damaged. If it is available, please go and borrow it.</p>
+    <form method="post" asp-controller="MyHolds" asp-action="Place" class="inline" autocomplete="off">
+      <input name="code" placeholder="Library code, for example LIB-0004" />
+      <button class="btn primary">Place hold</button>
+    </form>
+  </section>
+
+  <h2>My current holds</h2>
+  @if (Model.Holds.Count == 0)
+  {
+    <p class="empty">You have no holds right now.</p>
+  }
+  else
+  {
+    <table class="data">
+      <thead><tr><th>Item</th><th>Status</th><th>Place in line</th><th>Ready until</th><th></th></tr></thead>
+      <tbody>
+      @foreach (var h in Model.Holds)
+      {
+        <tr>
+          <td>@h.ItemName</td>
+          <td>@(h.Status == ReservationStatus.Ready ? "Ready to borrow" : "Waiting")</td>
+          <td>@h.Position</td>
+          <td>@(h.ExpiresAt is { } e ? e.ToString("d MMM yyyy") : "-")</td>
+          <td>
+            <form method="post" asp-controller="MyHolds" asp-action="Cancel" class="inline">
+              <input type="hidden" name="reservationId" value="@h.ReservationId" />
+              <button class="btn small">Cancel hold</button>
+            </form>
+          </td>
+        </tr>
+      }
+      </tbody>
+    </table>
+  }
+}

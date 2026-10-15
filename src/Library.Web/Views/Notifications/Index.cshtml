@@ -1,0 +1,80 @@
+@model NotificationsVm
+@{
+    ViewData["Title"] = "Notifications";
+    var msg = TempData["Msg"] as string;
+}
+<partial name="_StaffNav" />
+<h1>Notification dashboard</h1>
+<p>Messages are simulated. Nothing is really sent. They are saved here and written to the console log.</p>
+
+@if (!string.IsNullOrEmpty(msg))
+{
+  <p class="flash">@msg</p>
+}
+
+<section class="panel">
+  <p>
+    Date used by the system: <strong>@Model.Today.ToString("d MMM yyyy")</strong>
+    <span class="badge">@(Model.IsSimulated ? "simulated" : "real date")</span>
+  </p>
+  <form method="post" asp-controller="Notifications" asp-action="SetDate" class="inline">
+    <input type="date" name="date" value="@Model.TodayIso" />
+    <button class="btn">Set simulated today</button>
+  </form>
+  <form method="post" asp-controller="Notifications" asp-action="ClearDate" class="inline">
+    <button class="btn">Use real date</button>
+  </form>
+  <form method="post" asp-controller="Notifications" asp-action="Run" class="inline">
+    <button class="btn primary">Run checks now</button>
+  </form>
+  <form method="post" asp-controller="Notifications" asp-action="ClearAll" class="inline">
+    <button class="btn">Clear demo notifications</button>
+  </form>
+</section>
+
+<p>
+  @foreach (var kv in Model.Counts)
+  {
+    <span class="badge">@kv.Key: @kv.Value</span>
+  }
+</p>
+
+<form method="get" class="inline">
+  <select name="type">
+    <option value="">All types</option>
+    @foreach (var t in Enum.GetNames<NotificationType>())
+    {
+      <option value="@t" selected="@(Model.Type == t)">@t</option>
+    }
+  </select>
+  <input name="patron" value="@Model.Patron" placeholder="Patron name" />
+  <button class="btn">Filter</button>
+</form>
+
+@if (Model.Rows.Count == 0)
+{
+  <p class="empty">No notifications yet. Borrow an item or press Run checks now.</p>
+}
+else
+{
+  <table class="data">
+    <thead>
+      <tr><th>#</th><th>Time</th><th>Type</th><th>Channel</th><th>Patron</th><th>To</th><th>Message</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+    @foreach (var n in Model.Rows)
+    {
+      <tr>
+        <td>@n.Id</td>
+        <td>@n.CreatedAt.ToString("d MMM yyyy HH:mm")</td>
+        <td>@n.Type</td>
+        <td>@n.Channel</td>
+        <td>@n.BorrowerName</td>
+        <td>@n.Recipient</td>
+        <td><strong>@n.Subject</strong><br />@n.Body</td>
+        <td>@n.Status</td>
+      </tr>
+    }
+    </tbody>
+  </table>
+}
