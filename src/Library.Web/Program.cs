@@ -5,6 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Settings: appsettings.json -> appsettings.{Environment}.json -> user-secrets (Development) -> environment variables.
 builder.Services.AddControllersWithViews();
 builder.Services.AddLibraryOptions(builder.Configuration);
+builder.Services.AddLibraryApi(builder.Configuration);
 
 // Real services are registered here as each person merges them (docs/ARCHITECTURE.md, "Replacing a stub").
 // AddLibraryStubs() fills in anything that does not have a real implementation yet.
@@ -20,6 +21,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseStaticFiles();
 app.UseRouting();
+app.UseLibraryApi();
 app.UseAuthorization();
 
 app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
