@@ -20,6 +20,7 @@ public static class ApiServiceCollectionExtensions
             .ValidateOnStart();
         services.AddControllers(options => options.Filters.Add<ApiProblemDetailsFilter>());
         services.AddScoped<Library.Core.PublicCatalogue.PublicItemService>();
+        services.AddScoped<Library.Core.PublicCatalogue.PublicLibraryService>();
         services.AddCors(options => options.AddPolicy(CorsPolicy, policy => policy
             .AllowAnyOrigin()
             .WithMethods("GET", "HEAD", "OPTIONS")
