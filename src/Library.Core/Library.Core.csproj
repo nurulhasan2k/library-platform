@@ -8,6 +8,7 @@
   <ItemGroup>
     <!-- Only the logging and DI abstractions: they ship with the .NET SDK, nothing to download. -->
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="CsvHelper" Version="33.1.0" />
   </ItemGroup>
 
 </Project>

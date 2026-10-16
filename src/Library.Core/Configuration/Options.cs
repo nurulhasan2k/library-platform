@@ -66,6 +66,7 @@ public sealed class ImportOptions
 {
     public const string Section = "Import";
     public int MaxFileSizeMb { get; set; } = 5;
+    public int MaxRows { get; set; } = 5000;
 }
 
 public sealed class ReportOptions

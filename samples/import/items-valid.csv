@@ -1,0 +1,21 @@
+LibraryCode,ItemType,Name,Description,Category,Branch,Status,Author,Genre,Artist,Year,ToyType,RecommendedAge
+BK-500,book,Sample BK-500,Sample catalogue item,Science Fiction,RIVER,,Library Writer,Science Fiction,,,,
+BK-501,book,Sample BK-501,Sample catalogue item,Science Fiction,RIVER,Damaged,Library Writer,Science Fiction,,,,
+BK-502,book,Sample BK-502,Sample catalogue item,Science Fiction,RIVER,Available,Library Writer,Science Fiction,,,,
+BK-503,book,Sample BK-503,Sample catalogue item,Science Fiction,RIVER,Available,Library Writer,Science Fiction,,,,
+BK-504,book,Sample BK-504,Sample catalogue item,Science Fiction,RIVER,Available,Library Writer,Science Fiction,,,,
+BK-505,book,Sample BK-505,Sample catalogue item,Science Fiction,RIVER,Available,Library Writer,Science Fiction,,,,
+BK-506,book,Sample BK-506,Sample catalogue item,Science Fiction,RIVER,Available,Library Writer,Science Fiction,,,,
+BK-507,book,Sample BK-507,Sample catalogue item,Science Fiction,RIVER,Available,Library Writer,Science Fiction,,,,
+MU-508,music,Sample MU-508,Sample catalogue item,Rock,RIVER,Available,,,Sample Artist,2000,,
+MU-509,music,Sample MU-509,Sample catalogue item,Rock,RIVER,Available,,,Sample Artist,2000,,
+MU-510,music,Sample MU-510,Sample catalogue item,Rock,RIVER,Available,,,Sample Artist,2000,,
+MU-511,music,Sample MU-511,Sample catalogue item,Rock,RIVER,Available,,,Sample Artist,2000,,
+MU-512,music,Sample MU-512,Sample catalogue item,Rock,RIVER,Available,,,Sample Artist,2000,,
+MU-513,music,Sample MU-513,Sample catalogue item,Rock,RIVER,Available,,,Sample Artist,2000,,
+TY-514,toy,Sample TY-514,Sample catalogue item,Puzzle,RIVER,Available,,,,,Puzzle,6
+TY-515,toy,Sample TY-515,Sample catalogue item,Puzzle,RIVER,Available,,,,,Puzzle,6
+TY-516,toy,Sample TY-516,Sample catalogue item,Puzzle,RIVER,Available,,,,,Puzzle,6
+TY-517,toy,Sample TY-517,Sample catalogue item,Puzzle,RIVER,Available,,,,,Puzzle,6
+TY-518,toy,Sample TY-518,Sample catalogue item,Puzzle,RIVER,Available,,,,,Puzzle,6
+TY-519,toy,Sample TY-519,Sample catalogue item,Puzzle,RIVER,Available,,,,,Puzzle,6

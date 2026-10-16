@@ -24,6 +24,7 @@ Settings are read from `src/Library.Web/appsettings.json`. Each section is bound
 | `Api:MaxPageSize` | `100` | Largest page size the API accepts. | C |
 | `Api:EnableSwagger` | `true` | Serve the OpenAPI document and Swagger UI. | C |
 | `Import:MaxFileSizeMb` | `5` | Largest CSV file the importer accepts. | C |
+| `Import:MaxRows` | `5000` | Largest number of data records accepted; blank lines do not count. | C |
 | `Reports:IdleItemDays` | `90` | An item not borrowed for this many days is "idle" in the inventory-health report. | C |
 
 ## Setting a secret (API key example)
