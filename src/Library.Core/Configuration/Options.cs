@@ -71,6 +71,7 @@ public sealed class ImportOptions
 public sealed class ReportOptions
 {
     public const string Section = "Reports";
+    public int DefaultRangeDays { get; set; } = 180;
     /// <summary>An item not borrowed for this many days counts as idle in the inventory-health report.</summary>
     public int IdleItemDays { get; set; } = 90;
 }

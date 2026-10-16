@@ -1,0 +1,13 @@
+.report-filters, .report-exports { display: flex; flex-wrap: wrap; align-items: end; gap: 1rem; margin: 1rem 0; }
+.report-filters label { display: grid; gap: 0.25rem; }
+.report-filters input, .report-filters select, .report-filters button, .report-exports button { font: inherit; padding: 0.4rem; }
+.report-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin: 1rem 0; }
+.report-tile, .report-note { padding: 1rem; border: 1px solid var(--color-border); border-radius: var(--radius); background: var(--color-bg-soft); }
+.report-tile h2 { font-size: 1rem; margin: 0 0 0.5rem; }
+.report-tile strong { font-size: 1.5rem; }
+.report-errors { color: var(--color-danger); }
+.report-table { overflow-x: auto; }
+.report-caption { text-align: left; color: var(--color-muted); }
+.report-chart { list-style: none; padding: 0; }
+.report-chart li { display: flex; gap: 1rem; align-items: center; }
+.report-chart meter { width: 50%; accent-color: var(--color-primary); }

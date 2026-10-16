@@ -25,6 +25,7 @@ Settings are read from `src/Library.Web/appsettings.json`. Each section is bound
 | `Api:EnableSwagger` | `true` | Serve the OpenAPI document and Swagger UI. | C |
 | `Import:MaxFileSizeMb` | `5` | Largest CSV file the importer accepts. | C |
 | `Reports:IdleItemDays` | `90` | An item not borrowed for this many days is "idle" in the inventory-health report. | C |
+| `Reports:DefaultRangeDays` | `180` | Default borrowing and fine report range, including today. Inventory health remains as at today. | C |
 
 ## Setting a secret (API key example)
 

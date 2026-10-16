@@ -1,0 +1,111 @@
+@model Library.Web.Models.Reports.ReportPageViewModel
+@using System.Globalization
+@{
+    ViewData["Title"] = Model.Title;
+    string Date(DateOnly? value) => value?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) ?? "";
+    var canExport = !Model.Empty && ViewData.ModelState.IsValid;
+}
+<link rel="stylesheet" href="~/css/reports.css" asp-append-version="true" />
+<h1>@Model.Title</h1>
+<nav aria-label="Reports">
+    <a asp-action="Index" asp-route-from="@Date(Model.Filter.From)" asp-route-to="@Date(Model.Filter.To)" asp-route-branchId="@Model.Filter.BranchId">Dashboard</a> ·
+    <a asp-action="Borrowing" asp-route-from="@Date(Model.Filter.From)" asp-route-to="@Date(Model.Filter.To)" asp-route-branchId="@Model.Filter.BranchId">Borrowing statistics</a> ·
+    <a asp-action="FineRevenue" asp-route-from="@Date(Model.Filter.From)" asp-route-to="@Date(Model.Filter.To)" asp-route-branchId="@Model.Filter.BranchId">Fine revenue audit</a> ·
+    <a asp-action="Inventory" asp-route-branchId="@Model.Filter.BranchId" asp-route-idleDays="@Model.Filter.IdleDays">Inventory health</a>
+</nav>
+@if (Model.SampleData)
+{
+    <p class="report-note">Demonstration data: fixed sample records from August to October 2026, not database records.</p>
+}
+<p>As at @Date(Model.Today). Inventory figures use this date.</p>
+<div asp-validation-summary="All" class="report-errors" role="alert"></div>
+<form asp-action="@Model.Action" method="get" class="report-filters">
+    @if (!Model.Inventory)
+    {
+        <label>From <input type="date" name="from" value="@Date(Model.Filter.From)" required /></label>
+        <label>To <input type="date" name="to" value="@Date(Model.Filter.To)" required /></label>
+    }
+    <label>Branch
+        <select name="branchId" asp-items="Model.Branches">
+            <option value="">All branches</option>
+        </select>
+    </label>
+    @if (Model.Inventory)
+    {
+        <label>Idle days <input type="number" name="idleDays" min="0" value="@Model.Filter.IdleDays" required /></label>
+    }
+    <button type="submit">Apply filters</button>
+</form>
+@if (!Model.Dashboard)
+{
+    <form asp-action="@Model.Action" method="get" class="report-exports">
+        @if (!Model.Inventory)
+        {
+            <input type="hidden" name="from" value="@Date(Model.Filter.From)" />
+            <input type="hidden" name="to" value="@Date(Model.Filter.To)" />
+        }
+        <input type="hidden" name="branchId" value="@Model.Filter.BranchId" />
+        @if (Model.Inventory)
+        {
+            <input type="hidden" name="idleDays" value="@Model.Filter.IdleDays" />
+        }
+        <button type="submit" name="format" value="csv" disabled="@(!canExport)">Export CSV</button>
+        <button type="submit" name="format" value="pdf" disabled="@(!canExport)">Export PDF</button>
+    </form>
+}
+@if (Model.Empty && ViewData.ModelState.IsValid)
+{
+    <p class="report-note">No data for this period</p>
+}
+@if (ViewData.ModelState.IsValid)
+{
+    <div class="report-tiles">
+        @foreach (var tile in Model.Tiles)
+        {
+            <section class="report-tile"><h2>@tile.Label</h2><strong data-summary="@tile.Label">@tile.Value</strong></section>
+        }
+    </div>
+    @if (Model.Reconciliation is not null)
+    {
+        <section class="report-note"><h2>Reconciliation</h2><p>@Model.Reconciliation</p></section>
+    }
+    @if (Model.Accruing is not null)
+    {
+        <aside class="report-note"><h2>Accruing on overdue loans (not yet charged)</h2><p>@Model.Accruing</p><p>Separate from charged, collected and outstanding.</p></aside>
+    }
+    @foreach (var table in Model.Tables)
+    {
+        <section>
+            <h2>@table.Title</h2>
+            @if (table.Rows.Count == 0)
+            {
+                <p>No data for this period</p>
+            }
+            else
+            {
+                <div class="report-table">
+                    <table class="table">
+                        <caption class="report-caption">@table.Title</caption>
+                        <thead><tr>@foreach (var header in table.Headers) { <th scope="col">@header</th> }</tr></thead>
+                        <tbody>
+                        @foreach (var row in table.Rows)
+                        {
+                            <tr>@foreach (var cell in row) { <td>@cell</td> }</tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+                @if (table.MonthlyChart)
+                {
+                    var max = Math.Max(1, table.Rows.Max(r => int.Parse(r[1], CultureInfo.InvariantCulture)));
+                    <ul class="report-chart" aria-label="Loans by month">
+                        @foreach (var row in table.Rows)
+                        {
+                            <li><span>@row[0]</span> <meter min="0" max="@max" value="@row[1]">@row[1]</meter> @row[1]</li>
+                        }
+                    </ul>
+                }
+            }
+        </section>
+    }
+}

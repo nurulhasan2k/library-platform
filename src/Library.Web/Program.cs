@@ -5,6 +5,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Settings: appsettings.json -> appsettings.{Environment}.json -> user-secrets (Development) -> environment variables.
 builder.Services.AddControllersWithViews();
 builder.Services.AddLibraryOptions(builder.Configuration);
+builder.Services.AddLibraryReportExports();
+builder.Services.AddLibraryReportScreens();
 
 // Real services are registered here as each person merges them (docs/ARCHITECTURE.md, "Replacing a stub").
 // AddLibraryStubs() fills in anything that does not have a real implementation yet.
