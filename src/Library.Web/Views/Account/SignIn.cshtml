@@ -1,0 +1,15 @@
+@model PatronLoginForm
+@{ ViewData["Title"] = "My account"; }
+<div class="card form">
+  <h1>My library account</h1>
+  <p class="muted">Sign in with your library card number and 4-digit PIN to see your loans, fines and holds.</p>
+  <form method="post" asp-antiforgery="true" action="/account/signin">
+    <input type="hidden" name="ReturnUrl" value="@Model.ReturnUrl" />
+    <label for="CardNumber">Card number</label>
+    <input id="CardNumber" name="CardNumber" type="text" value="@Model.CardNumber" placeholder="LIB-1001" autocomplete="off" autofocus required />
+    <label for="Pin">PIN</label>
+    <input id="Pin" name="Pin" type="password" inputmode="numeric" maxlength="8" autocomplete="off" required />
+    <p style="margin-top:1rem"><button class="btn" type="submit">Sign in</button></p>
+  </form>
+  <p class="small muted">Forgotten your PIN? Ask at any branch desk.</p>
+</div>

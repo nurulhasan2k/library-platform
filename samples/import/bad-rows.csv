@@ -1,0 +1,18 @@
+type,code,name,description,branch,category,author,artist,year,age
+book,BK-601,Good row one,,RIVER,History,Some Author,,,
+,BK-602,Missing type,,RIVER,History,A,,,
+magazine,BK-603,Unknown type,,RIVER,History,A,,,
+book,,Missing code,,RIVER,History,A,,,
+book,bk 604,Code with a space and lower case,,RIVER,History,A,,,
+book,BK-001,Duplicate of an existing item,,RIVER,History,A,,,
+book,BK-605,,Name missing,RIVER,History,A,,,
+book,BK-606,Unknown branch,,MOON,History,A,,,
+book,BK-607,Unknown category,,RIVER,Cooking,A,,,
+book,BK-608,Book without an author,,RIVER,History,,,,
+music,MU-601,Music without an artist,,RIVER,Rock,,,1990,
+music,MU-602,Music with a bad year,,RIVER,Rock,,Some Band,nineteen,
+music,MU-603,Music from the far future,,RIVER,Rock,,Some Band,3050,
+toy,TY-601,Toy with no age,,RIVER,Puzzle,,,,
+toy,TY-602,Toy with a silly age,,RIVER,Puzzle,,,,900
+toy,TY-603,Good toy,,RIVER,Building,,,,5
+book,BK-601,Same code twice in this file,,RIVER,History,A,,,

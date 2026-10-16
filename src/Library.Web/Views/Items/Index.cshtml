@@ -1,0 +1,55 @@
+@model ItemsPage
+@{ ViewData["Title"] = "Items"; var branches = Model.Branches.ToDictionary(b => b.Id); int total = ViewBag.Total; var pages = (int)Math.Ceiling(total / (double)Model.PageSize);
+   string Qs(int p) => $"?q={Uri.EscapeDataString(Model.Q ?? "")}&type={Model.Type}&status={Model.Status}&branch={Model.Branch}&category={Model.Category}&page={p}"; }
+<div class="page-head">
+  <h1>Items</h1>
+  <div class="actions"><a class="btn" href="/admin/items/new?type=Book">Add book</a><a class="btn" href="/admin/items/new?type=Music">Add music</a><a class="btn" href="/admin/items/new?type=Toy">Add toy</a></div>
+</div>
+<form method="get" class="filters">
+  <div class="grow"><label for="q">Search</label><input id="q" name="q" type="search" value="@Model.Q" placeholder="Name, author, artist, code..." /></div>
+  <div><label for="type">Type</label><select id="type" name="type"><option value="">All</option>@foreach (var t in Enum.GetValues<ItemType>()) { <option value="@t" selected="@(Model.Type == t)">@t</option> }</select></div>
+  <div><label for="status">Status</label><select id="status" name="status"><option value="">All</option>@foreach (var s in Enum.GetValues<ItemStatus>()) { <option value="@s" selected="@(Model.Status == s)">@s.ToString().ToLower()</option> }</select></div>
+  <div><label for="branch">Branch</label><select id="branch" name="branch"><option value="">All</option>@foreach (var b in Model.Branches) { <option value="@b.Id" selected="@(Model.Branch == b.Id)">@b.Name</option> }</select></div>
+  <div><label for="category">Category</label><select id="category" name="category"><option value="">All</option>@foreach (var c in Model.Categories) { <option value="@c.Id" selected="@(Model.Category == c.Id)">@c.Name</option> }</select></div>
+  <div><button class="btn" type="submit">Filter</button></div>
+</form>
+<p class="muted">@total items</p>
+<div class="table-wrap"><table class="table stack">
+  <thead><tr><th>Code</th><th>Name</th><th>Type</th><th>Details</th><th>Branch</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+  @foreach (var i in Model.Items)
+  {
+    var transit = Model.InTransit.Contains(i.Id);
+    <tr>
+      <td data-label="Code"><code>@i.LibraryCode</code></td>
+      <td data-label="Name">@i.Name</td>
+      <td data-label="Type">@i.TypeName</td>
+      <td data-label="Details" class="small">@string.Join(", ", i.GetExtraDetails().Select(d => d.Value))</td>
+      <td data-label="Branch">@branches[i.BranchId].Name</td>
+      <td data-label="Status"><span class="badge @Fmt.StatusClass(i.Status, transit)">@Fmt.Status(i.Status, transit)</span></td>
+      <td class="right nowrap">
+        <a class="btn btn-ghost btn-sm" href="/admin/items/@i.Id/edit">Edit</a>
+        @if (i.Status != ItemStatus.Borrowed && !transit)
+        {
+          <form method="post" asp-antiforgery="true" action="/admin/items/@i.Id/status" class="inline">
+            <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+            <select name="status" onchange="this.form.submit()" aria-label="Change status of @i.Name" style="width:auto;min-height:2rem;padding:.2rem">
+              <option value="" disabled selected>Set status...</option>
+              @foreach (var s in new[] { ItemStatus.Available, ItemStatus.Damaged, ItemStatus.Destroy }.Where(s => s != i.Status)) { <option value="@s">@s.ToString().ToLower()</option> }
+            </select>
+          </form>
+        }
+      </td>
+    </tr>
+  }
+  </tbody></table>
+  @if (Model.Items.Count == 0) { <div class="empty">No items match.</div> }
+</div>
+@if (pages > 1)
+{
+  <nav class="pager">
+    @if (Model.Page > 1) { <a href="@Qs(Model.Page - 1)">&larr; Previous</a> }
+    <span>Page @Model.Page of @pages</span>
+    @if (Model.Page < pages) { <a href="@Qs(Model.Page + 1)">Next &rarr;</a> }
+  </nav>
+}

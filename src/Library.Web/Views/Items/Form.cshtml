@@ -1,0 +1,52 @@
+@model ItemForm
+@{ var isNew = Model.Id == 0; ViewData["Title"] = (isNew ? "Add " : "Edit ") + Model.Type.ToString().ToLower(); }
+<div class="card form">
+  <h1>@ViewData["Title"]</h1>
+  <form method="post" asp-antiforgery="true" action="@(isNew ? "/admin/items/new" : $"/admin/items/{Model.Id}/edit")">
+    <input type="hidden" name="Type" value="@Model.Type" />
+    <label for="Name">Name</label><input id="Name" name="Name" type="text" value="@Model.Name" required />
+    <label for="Description">Description</label><textarea id="Description" name="Description">@Model.Description</textarea>
+    <div class="form-row">
+      <div><label for="LibraryCode">Library code</label><input id="LibraryCode" name="LibraryCode" type="text" value="@Model.LibraryCode" required placeholder="@(Model.Type == ItemType.Book ? "BK-100" : Model.Type == ItemType.Music ? "MU-100" : "TY-100")" /></div>
+      <div>
+        <label for="BranchId">Branch</label>
+        @if (isNew)
+        {
+          <select id="BranchId" name="BranchId">@foreach (var b in Model.Branches.Where(b => b.IsActive)) { <option value="@b.Id" selected="@(b.Id == Model.BranchId)">@b.Name</option> }</select>
+        }
+        else
+        {
+          <input type="hidden" name="BranchId" value="@Model.BranchId" />
+          <input type="text" value="@Model.Branches.FirstOrDefault(b => b.Id == Model.BranchId)?.Name" disabled />
+          <div class="field-hint">To move an item, request a <a href="/transfers">transfer</a>.</div>
+        }
+      </div>
+    </div>
+    <label for="CategoryId">Category</label>
+    <select id="CategoryId" name="CategoryId"><option value="">- choose -</option>@foreach (var c in Model.Categories) { <option value="@c.Id" selected="@(Model.CategoryId == c.Id)">@c.Name</option> }</select>
+    @if (Model.Type == ItemType.Book)
+    {
+      <label for="Author">Author</label><input id="Author" name="Author" type="text" value="@Model.Author" required />
+      <div class="field-hint">The category is also the book's genre.</div>
+    }
+    else if (Model.Type == ItemType.Music)
+    {
+      <div class="form-row">
+        <div><label for="Artist">Artist</label><input id="Artist" name="Artist" type="text" value="@Model.Artist" required /></div>
+        <div><label for="Year">Year</label><input id="Year" name="Year" type="number" min="1000" max="@(DateTime.Now.Year + 1)" value="@Model.Year" required /></div>
+      </div>
+    }
+    else
+    {
+      <label for="RecommendedAge">Recommended age (from)</label><input id="RecommendedAge" name="RecommendedAge" type="number" min="0" max="120" value="@Model.RecommendedAge" required />
+      <div class="field-hint">The category is also the toy type.</div>
+    }
+    <p style="margin-top:1rem"><button class="btn" type="submit">Save</button> <a class="btn btn-ghost" href="/admin/items">Cancel</a></p>
+  </form>
+  @if (!isNew)
+  {
+    <hr />
+    <form method="post" asp-antiforgery="true" action="/admin/items/@Model.Id/delete" onsubmit="return confirm('Delete this item for good?')"><button class="btn btn-danger btn-sm" type="submit">Delete this item</button>
+      <span class="field-hint">Only possible if it has never been lent. Otherwise set its status to "destroy".</span></form>
+  }
+</div>

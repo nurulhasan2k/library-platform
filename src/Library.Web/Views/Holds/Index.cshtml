@@ -1,0 +1,30 @@
+@model IReadOnlyList<HoldDetails>
+@{ ViewData["Title"] = "Holds"; var borrowers = (IReadOnlyList<Borrower>)ViewBag.Borrowers; }
+<div class="page-head"><h1>Holds and waiting lists</h1>
+  <div class="actions">@if ((bool)ViewBag.HasBranch) { <a class="btn btn-ghost" href="/holds?allBranches=@(!(bool)ViewBag.All)">@((bool)ViewBag.All ? "Only this branch" : "All branches")</a> }</div></div>
+<p class="muted">A hold is for one particular copy. When it comes back, the first person waiting is told it is <strong>Ready</strong> and nobody else can borrow it until they collect it or it expires.</p>
+<div class="card">
+  <h2>Place a hold for a patron</h2>
+  <form method="post" asp-antiforgery="true" action="/holds/place" class="filters">
+    <div><label for="code">Item library code</label><input id="code" name="code" type="text" required /></div>
+    <div class="grow"><label for="borrower">Borrower</label><input id="borrower" name="borrower" list="bl" type="text" required /></div>
+    <datalist id="bl">@foreach (var b in borrowers) { <option value="@b.Name (@b.CardNumber)"></option> }</datalist>
+    <div><button class="btn" type="submit">Place hold</button></div>
+  </form>
+</div>
+<div class="table-wrap"><table class="table stack">
+  <thead><tr><th>Item</th><th>Branch</th><th>Patron</th><th>Place</th><th>Status</th><th>Placed</th><th></th></tr></thead>
+  <tbody>
+  @foreach (var h in Model)
+  {
+    <tr class="@(h.Status == ReservationStatus.Ready ? "row-warn" : "")">
+      <td data-label="Item">@h.ItemName <span class="muted">(@h.LibraryCode)</span></td><td data-label="Branch">@h.BranchName</td>
+      <td data-label="Patron"><a href="/borrowers/@h.BorrowerId">@h.BorrowerName</a></td><td data-label="Place">@h.Position of @h.QueueLength</td>
+      <td data-label="Status">@if (h.Status == ReservationStatus.Ready) { <span class="badge ok">Ready</span> <span class="small muted">until @(h.ExpiresAt is { } e ? Fmt.Date(e) : "")</span> } else { <span class="badge info">Waiting</span> }</td>
+      <td data-label="Placed">@Fmt.Date(h.CreatedAt) <span class="small muted">(@h.Source)</span></td>
+      <td class="right"><form method="post" asp-antiforgery="true" action="/holds/cancel"><input type="hidden" name="id" value="@h.ReservationId" /><button class="btn btn-ghost btn-sm" type="submit">Cancel</button></form></td>
+    </tr>
+  }
+  </tbody></table>
+  @if (Model.Count == 0) { <div class="empty">No open holds.</div> }
+</div>

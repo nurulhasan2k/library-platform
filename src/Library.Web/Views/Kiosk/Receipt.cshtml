@@ -1,0 +1,19 @@
+@model List<KioskReceiptLine>
+@inject WebBranchContext Ctx
+@{ ViewData["Title"] = "Receipt"; }
+<h1>Your receipt</h1>
+<div class="receipt">
+  <p><strong>@Ctx.CurrentBranch?.Name</strong><br />@Fmt.Date(DateOnly.FromDateTime(DateTime.Now))</p>
+  @if (Model.Count == 0) { <p>No items were checked out this visit.</p> }
+  else
+  {
+    <ul class="checkout-list">
+      @foreach (var l in Model) { <li><span>@l.Name (@l.Code)</span><span>due @Fmt.Date(l.DueOn)</span></li> }
+    </ul>
+    <p>Late items are fined $0.50 for every full day after the due date.</p>
+  }
+</div>
+<p style="margin-top:1rem" class="actions">
+  <button class="btn btn-ghost" type="button" onclick="window.print()">Print</button>
+  <form method="post" asp-antiforgery="true" action="/kiosk/signout"><button class="btn" type="submit">Finish &amp; sign out</button></form>
+</p>

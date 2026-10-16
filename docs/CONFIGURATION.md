@@ -3,28 +3,37 @@
 Settings are read from `src/Library.Web/appsettings.json`. Each section is bound to an options class in
 `src/Library.Core/Configuration/Options.cs`. Override a value for your machine without editing the shared file by using
 `appsettings.Development.json`, environment variables (use `__` for nesting, for example `Lending__LoanDays=21`) or
-`dotnet user-secrets`.
+`dotnet user-secrets`. The defaults are the demo settings: **nothing needs changing to run the demo.**
 
-| Key | Default | Meaning | Owner |
-|---|---|---|---|
-| `Database:ConnectionString` | `Data Source=data/library.db` | SQLite file for the whole app. The `data/` folder is not committed. | A |
-| `Database:SeedOnStartup` | `true` | Create the demo data on first start when the database is empty. | A |
-| `Lending:LoanDays` | `14` | Length of a loan in days (brief). | A |
-| `Lending:FinePerDay` | `0.50` | Fine per full day late (brief). | A |
-| `Auth:MaxPinAttempts` | `5` | Wrong PIN attempts before a patron is locked out. | A |
-| `Auth:LockoutMinutes` | `5` | Length of the lockout. | A |
-| `Kiosk:BranchCode` | `CENTRAL` | The branch this kiosk station belongs to. | B |
-| `Kiosk:IdleTimeoutSeconds` | `60` | Kiosk session ends after this many idle seconds. | B |
-| `Notifications:DueSoonDays` | `2` | A "due soon" notice is sent this many days before the due date. | B |
-| `Notifications:EnableScheduler` | `true` | Run the daily notification checks as a background job. | B |
-| `Reservations:MaxActiveHoldsPerPatron` | `5` | Most Waiting + Ready holds one patron may have. | B |
-| `Reservations:ReadyHoldDays` | `3` | Days a Ready hold is kept before it expires. | B |
-| `Api:Key` | *(empty)* | Key clients send in the `X-Api-Key` header. **Set with user-secrets; never commit.** | C |
-| `Api:RateLimitPerMinute` | `60` | Requests per minute per client before HTTP 429. | C |
-| `Api:MaxPageSize` | `100` | Largest page size the API accepts. | C |
-| `Api:EnableSwagger` | `true` | Serve the OpenAPI document and Swagger UI. | C |
-| `Import:MaxFileSizeMb` | `5` | Largest CSV file the importer accepts. | C |
-| `Reports:IdleItemDays` | `90` | An item not borrowed for this many days is "idle" in the inventory-health report. | C |
+| Key | Default | Meaning |
+|---|---|---|
+| `Database:DataFile` | `data/library.json` | The data file. A relative path is placed next to `LibraryPlatform.sln`; the environment variable `LIBRARY_DATA_FILE` overrides it. Not committed. |
+| `Database:SeedOnStartup` | `true` | Create the demo data on first start when the file is empty. |
+| `Lending:LoanDays` | `14` | Length of a loan in days. |
+| `Lending:FinePerDay` | `0.50` | Fine per full day late. |
+| `Auth:MaxPinAttempts` | `5` | Wrong PIN attempts before a patron is locked out. |
+| `Auth:LockoutMinutes` | `5` | Length of the lock-out. |
+| `Kiosk:BranchCode` | `CENTRAL` | The branch this kiosk belongs to. |
+| `Kiosk:IdleTimeoutSeconds` | `60` | A kiosk session ends after this many idle seconds. |
+| `Notifications:DueSoonDays` | `2` | A "due soon" notice is created this many days (or fewer) before the due date. |
+| `Notifications:EnableScheduler` | `true` | Run the daily notification checks as a background job. |
+| `Reservations:MaxActiveHoldsPerPatron` | `5` | Most Waiting + Ready holds one patron may have. |
+| `Reservations:ReadyHoldDays` | `3` | Days a Ready hold is kept before it expires. |
+| `Api:Key` | `demo-api-key-2026` | Key clients send in `X-Api-Key`. **Demo value**; set your own with user-secrets or `Api__Key`. If empty, the API answers 503. |
+| `Api:RateLimitPerMinute` | `60` | Requests per minute per client before HTTP 429. |
+| `Api:MaxPageSize` | `100` | Largest page size the API accepts. |
+| `Api:EnableDocs` | `true` | Serve the interactive API documentation page (`/api/docs`) and the OpenAPI JSON (`/api/openapi.json`). |
+| `Import:MaxFileSizeMb` | `5` | Largest CSV file the importer accepts. |
+| `Import:MaxRows` | `2000` | Most data rows in one import. |
+| `Reports:IdleItemDays` | `90` | An item not borrowed for this many days is "idle" in the inventory-health report. |
+
+## Command-line options
+
+| Option | Effect |
+|---|---|
+| `--reset-db` | Delete all data and create the demo data again before starting. |
+| `--exit` | Exit after start-up work (used with `--reset-db`). |
+| `--urls http://localhost:5090` | Listen on another address (standard ASP.NET Core option). |
 
 ## Setting a secret (API key example)
 

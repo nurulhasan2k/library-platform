@@ -1,42 +1,44 @@
-# Entity-relationship diagram (draft for Meeting 1)
+# Data model (entity-relationship diagram)
 
-The proposed data model for the platform. Items, borrowers, loans and staff users come from Assignment 2;
-the other tables are new. The three item types (Book, Music, Toy) are stored in **one table** (EF Core "table per hierarchy"),
-with the type-specific columns empty for the other types.
+The platform keeps its data in one JSON file (`data/library.json`) holding these collections. Items, borrowers, loans and staff users
+come from Assignment 2; the rest are new for this project. The three item types (Book, Music, Toy) share one `Items` collection with a
+`type` field and the type-specific fields filled in only for their own type. One counter hands out every id, so ids are unique across
+all collections.
 
 ![ER diagram](images/er-diagram.png)
 
-Key points to confirm at the meeting:
+Key points:
 
-- `Item.BranchId` is where the copy physically is **now**. A return at another branch moves it; a transfer moves it deliberately.
-- One `LibraryCode` is one physical copy (decision 4: holds are per item, not per title).
-- "In transit" is not stored on the item: it is derived from an active `Transfer` (Requested or InTransit).
-- `Loan.FinePaid` / `FinePaidOn` let reception mark a fine collected, so reports can show charged, collected and outstanding.
-- `USER_BRANCH` says which branches a Reception user may choose after login.
-- `APP_SETTING` holds the admin "simulated today" value (decision 10).
-- Owners: Branch, OpeningHours, ReceptionDesk, Category, Item, Borrower, Loan, User, UserBranch, Transfer, AppSetting: **A**.
-  Reservation, Notification: **B**. ImportBatch: **C**.
+- `Item.BranchId` is where the copy physically is **now**. A return at another branch moves it; a transfer moves it deliberately (on *Received*).
+- One `LibraryCode` is one physical copy, so reservations are per item, not per title.
+- "In transit" is not stored on the item: it is derived from an active `Transfer` (Requested or InTransit). Such an item cannot be lent.
+- `Loan.FineAmount`, `FinePaid` and `FinePaidOn` let reception record a fine as collected, so reports can show charged, collected and outstanding.
+- `Loan.Channel` (Desk or Kiosk) and `ReturnBranchId` feed the reports (kiosk share, returns at another branch).
+- `User.BranchIds` lists the branches a Reception user may choose after sign-in; opening hours and desks are stored inside each branch.
+- `Notification.DedupKey` stops the daily checks creating the same notice twice.
+- `Settings.SimulatedToday` holds the admin "simulated today" date.
+- Passwords and PINs are stored only as PBKDF2 hashes.
 
 ## Source (renders on GitHub)
 
 ```mermaid
 erDiagram
-    BRANCH ||--o{ OPENING_HOURS : "has"
-    BRANCH ||--o{ RECEPTION_DESK : "has"
+    BRANCH ||--o{ OPENING_HOURS : "has (stored inside the branch)"
+    BRANCH ||--o{ DESK : "has (stored inside the branch)"
     BRANCH ||--o{ ITEM : "holds (physical location)"
-    BRANCH ||--o{ USER_BRANCH : "staff may work at"
-    USER ||--o{ USER_BRANCH : "assigned to"
+    BRANCH ||--o{ LOAN : "lent at"
+    USER }o--o{ BRANCH : "may work at"
     CATEGORY ||--o{ ITEM : "classifies"
     ITEM ||--o{ LOAN : "is lent in"
     BORROWER ||--o{ LOAN : "borrows"
-    RECEPTION_DESK |o--o{ LOAN : "processed at"
+    DESK |o--o{ LOAN : "processed at"
     ITEM ||--o{ TRANSFER : "moves via"
     BRANCH ||--o{ TRANSFER : "from / to"
     ITEM ||--o{ RESERVATION : "is held by"
     BORROWER ||--o{ RESERVATION : "places"
     BORROWER ||--o{ NOTIFICATION : "receives"
     LOAN |o--o{ NOTIFICATION : "about"
-    USER ||--o{ IMPORT_BATCH : "runs"
+    BRANCH ||--o{ IMPORT_BATCH : "imported into"
 
     BRANCH {
         int Id PK
@@ -47,15 +49,13 @@ erDiagram
         bool IsActive
     }
     OPENING_HOURS {
-        int Id PK
-        int BranchId FK
-        int DayOfWeek
-        time OpenTime "null = closed"
-        time CloseTime "null = closed"
+        string Day
+        time Open
+        time Close
+        bool IsClosed
     }
-    RECEPTION_DESK {
+    DESK {
         int Id PK
-        int BranchId FK
         string Name
     }
     CATEGORY {
@@ -68,7 +68,7 @@ erDiagram
         string LibraryCode UK "one code = one physical copy"
         string Name
         string Description
-        string ItemType "Book / Music / Toy"
+        string Type "Book / Music / Toy"
         string Status "Available / Borrowed / Damaged / Destroy"
         int BranchId FK "where the copy is now"
         int CategoryId FK
@@ -83,36 +83,36 @@ erDiagram
         int Id PK
         string CardNumber UK
         string PinHash
-        string FullName
+        string Name
         string Email
         string Phone
+        string Address
         string PreferredChannel "Email / Sms / Both"
+        int FailedPinAttempts
+        datetime LockedUntil
     }
     LOAN {
         int Id PK
         int ItemId FK
         int BorrowerId FK
+        int BranchId FK "where it was lent"
+        int DeskId FK
+        string Channel "Desk / Kiosk"
         date BorrowedOn
         date DueOn
         date ReturnedOn "null = active"
+        int ReturnBranchId FK
+        bool ReturnedDamaged
         decimal FineAmount
         bool FinePaid
         date FinePaidOn
-        int BorrowedAtBranchId FK
-        int ReturnedAtBranchId FK
-        int DeskId FK
-        bool ReturnedDamaged
     }
     USER {
         int Id PK
         string Username UK
         string PasswordHash
         string Role "Admin / Reception / Manager"
-        string FullName
-    }
-    USER_BRANCH {
-        int UserId FK
-        int BranchId FK
+        list BranchIds
     }
     TRANSFER {
         int Id PK
@@ -120,10 +120,11 @@ erDiagram
         int FromBranchId FK
         int ToBranchId FK
         string Status "Requested / InTransit / Received / Cancelled"
-        datetime RequestedAt
         int RequestedByUserId FK
+        datetime RequestedAt
         datetime DispatchedAt
         datetime ReceivedAt
+        datetime CancelledAt
         string Note
     }
     RESERVATION {
@@ -131,38 +132,38 @@ erDiagram
         int ItemId FK
         int BorrowerId FK
         string Status "Waiting / Ready / Fulfilled / Cancelled / Expired"
+        string Source "Kiosk / Web / Desk"
         datetime CreatedAt
-        datetime NotifiedAt
+        datetime ReadyAt
         datetime ExpiresAt
-        string PlacedVia "Kiosk / Web / Desk"
+        datetime ClosedAt
     }
     NOTIFICATION {
         int Id PK
-        string Type
+        string Type "Borrowed / DueSoon / FineAccruing / ReservationReady / ReservationExpired"
         string Channel "Email / Sms"
         int BorrowerId FK
         int ItemId FK
         int LoanId FK
+        int ReservationId FK
         string Recipient
         string Subject
         string Body
         datetime CreatedAt
-        string Status "Simulated sent"
-        string DedupeKey UK
+        string DedupKey "stops duplicates"
     }
     IMPORT_BATCH {
         int Id PK
-        string Source "Csv / MockProvider"
-        string FileName
-        int ByUserId FK
-        datetime At
-        int RowsTotal
-        int RowsCreated
-        int RowsRejected
-        string ErrorSummary
+        string Source "Csv file name / Mock provider"
+        int BranchId FK
+        string ImportedBy
+        datetime ImportedAt
+        int TotalRows
+        int ImportedRows
+        int SkippedRows
+        list Problems
     }
-    APP_SETTING {
-        string Key PK
-        string Value "for example SimulatedToday"
+    SETTINGS {
+        date SimulatedToday "admin simulated date"
     }
 ```

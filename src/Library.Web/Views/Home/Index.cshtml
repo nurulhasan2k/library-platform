@@ -1,12 +1,54 @@
-@{
-    ViewData["Title"] = "Home";
-}
-<h1>Library Platform</h1>
-<p>
-  The multi-branch library platform is under construction. The foundation (database, roles, branches and lending)
-  is being ported from the Assignment 2 system and will replace this page.
-</p>
-@if (ViewContext.HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment())
+@model SearchPage
+@{ ViewData["Title"] = "Search the catalogue"; }
+<section class="hero">
+  <h1>Find a book, album or toy</h1>
+  <p>Search every branch. Works on your phone &mdash; no sign-in needed.</p>
+  <form method="get" action="/" class="searchbar" role="search">
+    <input type="search" name="q" value="@Model.Q" placeholder="Title, author, artist, code..." aria-label="Search words" />
+    <select name="type" aria-label="Type">
+      <option value="">All types</option>
+      <option value="Book" selected="@(Model.Type == ItemType.Book)">Books</option>
+      <option value="Music" selected="@(Model.Type == ItemType.Music)">Music</option>
+      <option value="Toy" selected="@(Model.Type == ItemType.Toy)">Toys</option>
+    </select>
+    <select name="branch" aria-label="Branch">
+      <option value="">All branches</option>
+      @foreach (var b in Model.Branches) { <option value="@b.Id" selected="@(Model.Branch == b.Id)">@b.Name</option> }
+    </select>
+    <select name="category" aria-label="Category">
+      <option value="">All categories</option>
+      @foreach (var c in Model.Categories) { <option value="@c.Id" selected="@(Model.Category == c.Id)">@c.Name (@c.ItemType.ToString().ToLower())</option> }
+    </select>
+    <button class="btn" type="submit">Search</button>
+  </form>
+  <label class="check"><input form="" type="checkbox" onclick="location.href=this.checked?'@Html.Raw(Url.Action("Index", new { q = Model.Q, type = Model.Type, category = Model.Category, branch = Model.Branch, available = true }))':'@Html.Raw(Url.Action("Index", new { q = Model.Q, type = Model.Type, category = Model.Category, branch = Model.Branch }))'" checked="@Model.Available" /> Show only items available now</label>
+</section>
+
+<p class="muted" aria-live="polite">@Fmt.Plural(Model.Result.TotalCount, "item", "items") found</p>
+@if (Model.Result.Items.Count == 0)
 {
-  <p><a href="/dev/contracts">Developer view: which shared services are real or still stubs</a></p>
+  <div class="card empty">Nothing matched. Try fewer words, or clear the filters.</div>
+}
+else
+{
+  <div class="results">
+    @foreach (var i in Model.Result.Items)
+    {
+      <article class="result">
+        <span class="type-pill">@i.Type@(i.CategoryName != null ? " · " + i.CategoryName : "")</span>
+        <h3><a href="/items/@i.LibraryCode">@i.Name</a></h3>
+        <div class="meta">@string.Join(" · ", i.Details.Where(d => d.Key is "Author" or "Artist" or "Year" or "Age").Select(d => d.Value))</div>
+        <div class="meta">@i.BranchName &middot; <code>@i.LibraryCode</code></div>
+        <div class="foot">
+          <span class="badge @Fmt.StatusClass(i.Status, i.InTransit)">@Fmt.Status(i.Status, i.InTransit)</span>
+          <a class="small" href="/items/@i.LibraryCode">Details</a>
+        </div>
+      </article>
+    }
+  </div>
+  @await Html.PartialAsync("_Pager", new PagerModel
+  {
+    Page = Model.Result.Page, TotalPages = Model.Result.TotalPages, Total = Model.Result.TotalCount,
+    Url = p => Url.Action("Index", new { q = Model.Q, type = Model.Type, category = Model.Category, branch = Model.Branch, available = Model.Available ? "true" : null, page = p })!
+  })
 }

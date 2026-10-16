@@ -1,0 +1,32 @@
+@model Library.Web.Controllers.ReportPage
+@{ var d = Model.Document; var f = Model.Filter; var branches = (IReadOnlyList<Library.Core.Models.Branch>)ViewBag.Branches; ViewData["Title"] = d.Title;
+   string Q() => Model.UsesDates ? $"?from={f.From:yyyy-MM-dd}&to={f.To:yyyy-MM-dd}&branch={f.BranchId}" : $"?branch={f.BranchId}"; }
+<div class="page-head">
+  <div><h1>@d.Title</h1><p class="muted">@d.Subtitle</p></div>
+  <div class="actions"><a class="btn" href="/reports/@Model.Route@Q()&format=csv">Download CSV</a><a class="btn" href="/reports/@Model.Route@Q()&format=pdf">Download PDF</a><a class="btn btn-ghost" href="/reports">Dashboard</a></div>
+</div>
+<form method="get" class="filters">
+  @if (Model.UsesDates)
+  {
+    <div><label for="from">From</label><input id="from" name="from" type="date" value="@f.From.ToString("yyyy-MM-dd")" /></div>
+    <div><label for="to">To</label><input id="to" name="to" type="date" value="@f.To.ToString("yyyy-MM-dd")" /></div>
+  }
+  <div><label for="branch">Branch</label><select id="branch" name="branch"><option value="">All branches</option>@foreach (var b in branches) { <option value="@b.Id" selected="@(f.BranchId == b.Id)">@b.Name</option> }</select></div>
+  <div><button class="btn" type="submit">Update</button></div>
+</form>
+<div class="grid grid-4">
+  @foreach (var s in d.Summary) { <div class="stat"><div class="num" style="font-size:1.35rem">@s.Value</div><div class="label">@s.Key</div></div> }
+</div>
+@foreach (var t in d.Tables)
+{
+  var right = new HashSet<int>(t.RightAligned ?? Array.Empty<int>());
+  <h2>@t.Heading</h2>
+  <div class="table-wrap"><table class="table stack">
+    <thead><tr>@for (var c = 0; c < t.Columns.Count; c++) { <th class="@(right.Contains(c) ? "num" : "")">@t.Columns[c]</th> }</tr></thead>
+    <tbody>
+    @foreach (var r in t.Rows) { <tr>@for (var c = 0; c < r.Count; c++) { <td data-label="@t.Columns[c]" class="@(right.Contains(c) ? "num" : "")">@r[c]</td> }</tr> }
+    </tbody></table>
+    @if (t.Rows.Count == 0) { <div class="empty">Nothing to show.</div> }
+  </div>
+}
+<p class="small muted">Generated @Fmt.DateTime_(d.GeneratedAt).</p>

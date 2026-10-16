@@ -1,18 +1,85 @@
+@inject WebBranchContext BranchCtx
+@{
+    var staff = User.Identity?.IsAuthenticated == true;
+    var role = staff ? (User.IsInRole("Admin") ? "Admin" : User.IsInRole("Reception") ? "Reception" : "Manager") : "";
+    var patron = (await Context.AuthenticateAsync("Patron")).Succeeded;
+    var branch = staff ? BranchCtx.CurrentBranch : null;
+    string Active(string controller) => string.Equals((string?)ViewContext.RouteData.Values["controller"], controller, StringComparison.OrdinalIgnoreCase) ? "active" : "";
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>@ViewData["Title"] - Library Platform</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231f5f73'/%3E%3Cpath d='M14 46V18h12c4 0 6 2 6 6v22M50 46V18H38c-4 0-6 2-6 6' stroke='%23fff' stroke-width='5' fill='none'/%3E%3C/svg%3E" />
   <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
+  <a class="skip" href="#main">Skip to content</a>
   <header class="site-header">
-    <a class="brand" href="/">Library Platform</a>
+    <div class="header-inner">
+      <a class="brand" href="/">Library Platform</a>
+      <button class="nav-toggle" type="button" aria-label="Menu" aria-expanded="false" onclick="var n=document.getElementById('nav');var o=n.classList.toggle('open');this.setAttribute('aria-expanded',o)">Menu</button>
+      <nav id="nav" class="nav" aria-label="Main">
+        <a class="@Active("Home")" href="/">Search</a>
+        <a href="/branches">Branches</a>
+        <a href="/api/docs">API</a>
+        @if (staff && role != "Manager")
+        {
+          <span class="nav-sep"></span>
+          <a class="@Active("Desk")" href="/desk">Desk</a>
+          <a class="@Active("Borrowers")" href="/borrowers">Borrowers</a>
+          <a class="@Active("Holds")" href="/holds">Holds</a>
+          <a class="@Active("Transfers")" href="/transfers">Transfers</a>
+          <a class="@Active("Notifications")" href="/notifications">Notifications</a>
+        }
+        @if (staff && role == "Admin")
+        {
+          <span class="nav-sep"></span>
+          <a class="@Active("Items")" href="/admin/items">Items</a>
+          <a class="@Active("Branches")" href="/admin/branches">Branches</a>
+          <a class="@Active("Categories")" href="/admin/categories">Categories</a>
+          <a class="@Active("Import")" href="/admin/import">Import</a>
+          <a class="@Active("Users")" href="/admin/users">Staff</a>
+        }
+        @if (staff && (role == "Admin" || role == "Manager"))
+        {
+          <a class="@Active("Reports")" href="/reports">Reports</a>
+        }
+        @if (staff && role == "Manager")
+        {
+          <a class="@Active("Transfers")" href="/transfers">Transfers</a>
+          <a class="@Active("Notifications")" href="/notifications">Notifications</a>
+        }
+        <span class="nav-fill"></span>
+        @if (staff)
+        {
+          <span class="who" title="Signed in as @User.Identity!.Name (@role)">
+            @User.Identity!.Name
+            @if (branch != null) { <text> &middot; </text><a href="/staff/branch" class="who-branch">@branch.Name@(BranchCtx.CurrentDeskName is { } dn ? " / " + dn : "")</a> }
+          </span>
+          <form method="post" asp-antiforgery="true" action="/staff/logout" class="inline"><button class="link-btn" type="submit">Sign out</button></form>
+        }
+        else if (patron)
+        {
+          <a href="/account">My account</a>
+        }
+        else
+        {
+          <a href="/account">My account</a>
+          <a href="/staff/login">Staff sign in</a>
+        }
+      </nav>
+    </div>
   </header>
-  <main class="container">
+  <main id="main" class="container">
+    @await Html.PartialAsync("_Flash")
     @RenderBody()
   </main>
-  <footer class="site-footer">Distributed Development group project</footer>
+  <footer class="site-footer">
+    Library Platform &middot; Distributed Development group project &middot; <a href="/kiosk">Kiosk</a>
+  </footer>
+  @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

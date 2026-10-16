@@ -1,0 +1,19 @@
+@model Borrower
+@{ var isNew = Model.Id == 0; ViewData["Title"] = isNew ? "Add a borrower" : "Edit borrower"; }
+<div class="card form">
+  <h1>@ViewData["Title"]</h1>
+  <form method="post" asp-antiforgery="true" action="@(isNew ? "/borrowers/new" : $"/borrowers/{Model.Id}/edit")">
+    <label for="Name">Name</label><input id="Name" name="Name" type="text" value="@Model.Name" required />
+    <div class="form-row">
+      <div><label for="Phone">Phone</label><input id="Phone" name="Phone" type="text" value="@Model.Phone" /></div>
+      <div><label for="Email">Email</label><input id="Email" name="Email" type="email" value="@Model.Email" /></div>
+    </div>
+    <label for="Address">Address</label><input id="Address" name="Address" type="text" value="@Model.Address" />
+    <label for="PreferredChannel">Send notifications by</label>
+    <select id="PreferredChannel" name="PreferredChannel">
+      @foreach (var c in Enum.GetValues<NotificationChannel>()) { <option value="@c" selected="@(Model.PreferredChannel == c)">@(c == NotificationChannel.Both ? "Email and SMS" : c.ToString())</option> }
+    </select>
+    <p class="field-hint">A phone number or email is needed for the channel chosen. @(isNew ? "A card number and a PIN are created automatically." : "")</p>
+    <p style="margin-top:1rem"><button class="btn" type="submit">Save</button> <a class="btn btn-ghost" href="@(isNew ? "/borrowers" : $"/borrowers/{Model.Id}")">Cancel</a></p>
+  </form>
+</div>

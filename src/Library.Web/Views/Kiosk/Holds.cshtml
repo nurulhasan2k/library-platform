@@ -1,0 +1,29 @@
+@model AccountSummary
+@{ ViewData["Title"] = "My holds"; ViewData["CancelAction"] = "/kiosk/holds/cancel"; }
+<h1>My holds</h1>
+<div class="card">
+  <form method="post" asp-antiforgery="true" action="/kiosk/holds" autocomplete="off">
+    <label for="code">Place a hold: scan or type the item's library code</label>
+    <input id="code" name="code" type="text" placeholder="BK-010" />
+    <p style="margin-top:1rem"><button class="btn" type="submit">Place hold</button></p>
+  </form>
+</div>
+@if (Model.Holds.Count == 0) { <div class="card"><p class="muted">You have no holds.</p></div> }
+else
+{
+  <div class="card">
+    <ul class="checkout-list">
+    @foreach (var h in Model.Holds)
+    {
+      <li>
+        <span><strong>@h.ItemName</strong> <span class="muted">(@h.LibraryCode, @h.BranchName)</span><br />
+          @if (h.Status == ReservationStatus.Ready) { <span class="badge ok">Ready to collect</span> <span class="small">until @(h.ExpiresAt is { } e ? Fmt.Date(e) : "")</span> }
+          else { <span class="badge info">Waiting &mdash; place @h.Position of @h.QueueLength</span> }
+        </span>
+        <form method="post" asp-antiforgery="true" action="/kiosk/holds/cancel"><input type="hidden" name="id" value="@h.ReservationId" /><button class="btn btn-ghost btn-sm" type="submit">Cancel</button></form>
+      </li>
+    }
+    </ul>
+  </div>
+}
+<p><a href="/kiosk/home">&larr; Back to my account</a></p>

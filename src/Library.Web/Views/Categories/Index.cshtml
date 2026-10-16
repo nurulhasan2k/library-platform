@@ -1,0 +1,28 @@
+@model IReadOnlyList<CategoryInfo>
+@{ ViewData["Title"] = "Categories"; }
+<h1>Categories</h1>
+<p class="muted">Categories are used by search, the public API and the importer. A book's category is its genre; a toy's category is its toy type.</p>
+<div class="card">
+  <h2>Add a category</h2>
+  <form method="post" asp-antiforgery="true" action="/admin/categories/new" class="filters">
+    <div class="grow"><label for="name">Name</label><input id="name" name="name" type="text" required /></div>
+    <div><label for="type">For</label><select id="type" name="type">@foreach (var t in Enum.GetValues<ItemType>()) { <option value="@t">@t</option> }</select></div>
+    <div><button class="btn" type="submit">Add</button></div>
+  </form>
+</div>
+@foreach (var group in Model.GroupBy(c => c.ItemType))
+{
+  <h2>@group.Key categories</h2>
+  <div class="table-wrap"><table class="table stack">
+    <thead><tr><th>Name</th><th class="num">Items</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var c in group)
+    {
+      <tr>
+        <td data-label="Name"><form method="post" asp-antiforgery="true" action="/admin/categories/@c.Id/rename" class="actions"><input type="text" name="name" value="@c.Name" style="max-width:260px" aria-label="Name" /><button class="btn btn-ghost btn-sm" type="submit">Rename</button></form></td>
+        <td class="num" data-label="Items">@c.ItemCount</td>
+        <td class="right"><form method="post" asp-antiforgery="true" action="/admin/categories/@c.Id/delete" onsubmit="return confirm('Delete this category?')"><button class="btn btn-danger btn-sm" type="submit">Delete</button></form></td>
+      </tr>
+    }
+    </tbody></table></div>
+}

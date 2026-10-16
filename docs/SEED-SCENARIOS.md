@@ -1,180 +1,153 @@
-# Seed data scenarios (draft for Meeting 1)
+# Demo data (seed)
 
-This is the list of demo data the platform will create (client section 6). It is written **before** the code so B and C can say
-what they need. The seeder is built by Person A (`SeedRunner`, one seeder class per module); B adds reservations and
-notifications, C adds the sample import files.
+The application creates this data automatically the first time it starts with an empty data file, and again after `--reset-db`.
+Dates are relative to the day the data is created, so there are always overdue and due-soon items. Random loan history uses a fixed
+seed (2026), so two resets give the same shape of data.
 
-## Principles
+Credentials and PINs below are **demo values** and are written here on purpose.
 
-- **Relative dates.** Every date is an offset from "today" (`D`, taken from `IClock` when the data is created), so the due-soon,
-  overdue and fine scenarios work whenever the app is reset. `D-12` means twelve days before today.
-- **Repeatable.** The same data every time (fixed random seed 2026 for the filler data).
-- **Resettable.** `dotnet run --project src/Library.Web -- --reset-db` (and `scripts/reset-db.ps1` / `scripts/reset-db.sh`) deletes
-  the database, recreates it and seeds it. Documented in the README.
-- **Named scenarios.** The things the client will test are named below, so a demo never depends on luck.
-- **Demo credentials only.** Passwords and PINs here are for the demo and are written in the README on purpose.
+## 1. Branches
 
-## 1. Branches, hours and desks
-
-| Code | Name | Address (fictional) | Phone (fictional) | Opening hours | Desks |
-|---|---|---|---|---|---|
-| CENTRAL | Central Library | 1 Library Square | (08) 5550 0101 | Mon-Fri 09:00-18:00, Sat 10:00-16:00, **Sun closed** | Desk 1, Desk 2 |
-| NORTH | Northside Library | 22 Northside Road | (08) 5550 0102 | Tue-Fri 10:00-17:00, Sat 10:00-14:00, **Sun and Mon closed** | Desk 1, Desk 2 |
-| RIVER | Riverside Library | 5 Riverbank Walk | (08) 5550 0103 | Mon-Fri 09:00-17:00, Sun 12:00-16:00, **Sat closed** | Desk 1, Desk 2 |
-
-Every branch has at least one closed day so the API's "operating status" has something to show on any day.
-
-## 2. Staff accounts (demo)
-
-| Username | Password | Role | Branches they may choose |
+| Code | Name | Desks | Hours |
 |---|---|---|---|
-| `admin` | `admin123` | Admin | all |
-| `reception` | `reception123` | Reception | CENTRAL, NORTH (so the "select a branch" demo has a real choice) |
-| `reception.river` | `reception123` | Reception | RIVER only (branch chosen automatically) |
-| `manager` | `manager123` | Manager | all (read-only) |
+| CENTRAL | Central Library | 2 | Mon-Fri 09:00-18:00, Sat 10:00-16:00, Sun closed |
+| NORTH | Northside Library | 2 | Mon closed, Tue-Fri 10:00-17:00, Sat 10:00-14:00, Sun closed |
+| RIVER | Riverside Library | 2 | Mon-Fri 09:00-17:00, Sat closed, Sun 12:00-16:00 |
 
-`admin`, `reception` and `manager` are the Assignment 2 logins, kept so the baseline still behaves the same.
+The kiosk belongs to CENTRAL by default (`Kiosk:BranchCode`).
+
+## 2. Staff users
+
+| Username | Password | Role | Branches |
+|---|---|---|---|
+| admin | admin123 | Admin | all |
+| reception | reception123 | Reception | CENTRAL, NORTH |
+| reception.river | reception123 | Reception | RIVER |
+| manager | manager123 | Manager | all (reports only) |
+
+A reception user with two branches is asked to choose a branch and desk after signing in; `reception.river` has one branch and goes straight in.
 
 ## 3. Categories
 
-| Type | Categories |
-|---|---|
-| Book | Science Fiction, Fantasy, Programming, History |
-| Music | Rock, Jazz, Classical |
-| Toy | Puzzle, Building |
+- **Book**: Science Fiction, Fantasy, Programming, History
+- **Music**: Rock, Jazz, Classical
+- **Toy**: Puzzle, Building
 
 ## 4. Items (45)
 
-Library codes are globally unique: `BK-001`..., `MU-001`..., `TY-001`....
+Per branch: CENTRAL 18, NORTH 14, RIVER 13. Types: Book 24, Music 12, Toy 9.
 
-| Branch | Items | Books | Music | Toys |
+| Code | Name | Branch | Category | Status |
 |---|---|---|---|---|
-| CENTRAL | 18 | 10 | 5 | 3 |
-| NORTH | 14 | 7 | 4 | 3 |
-| RIVER | 13 | 7 | 3 | 3 |
-| **Total** | **45** | **24** | **12** | **9** |
+| BK-001 | Dune | CENTRAL | Science Fiction | Available |
+| BK-002 | Neuromancer | CENTRAL | Science Fiction | Available |
+| BK-003 | The Name of the Wind | CENTRAL | Fantasy | Borrowed |
+| BK-005 | Sapiens | NORTH | History | Borrowed |
+| BK-006 | Clean Architecture | NORTH | Programming | Available |
+| BK-007 | The Fellowship of the Ring | NORTH | Fantasy | Available |
+| BK-008 | Snow Crash | NORTH | Science Fiction | Available |
+| BK-009 | Guns, Germs, and Steel | NORTH | History | Damaged |
+| BK-010 | The Pragmatic Programmer | CENTRAL | Programming | Borrowed |
+| BK-011 | Clean Code | CENTRAL | Programming | Available |
+| BK-012 | Eloquent JavaScript | NORTH | Programming | Available |
+| BK-013 | The Left Hand of Darkness | RIVER | Science Fiction | Available |
+| BK-014 | Mistborn: The Final Empire | RIVER | Fantasy | Available |
+| BK-015 | Refactoring | RIVER | Programming | Borrowed |
+| BK-016 | The Silk Roads | RIVER | History | Available |
+| BK-017 | Hyperion | RIVER | Science Fiction | Available |
+| BK-018 | Introduction to Algorithms | RIVER | Programming | Available |
+| BK-020 | The Hobbit | CENTRAL | Fantasy | Borrowed |
+| BK-021 | Foundation | CENTRAL | Science Fiction | Borrowed |
+| BK-030 | Piranesi | CENTRAL | Fantasy | Available |
+| BK-031 | A Short History of Nearly Everything | CENTRAL | History | Available |
+| BK-032 | Project Hail Mary | CENTRAL | Science Fiction | Available |
+| BK-033 | The Martian | NORTH | Science Fiction | Available |
+| BK-040 | An old atlas | RIVER | History | Destroy |
+| MU-001 | Rumours | CENTRAL | Rock | Available |
+| MU-002 | A Love Supreme | CENTRAL | Jazz | Available |
+| MU-003 | The Dark Side of the Moon | CENTRAL | Rock | Available |
+| MU-004 | The Four Seasons | NORTH | Classical | Borrowed |
+| MU-005 | Symphony No. 5 | CENTRAL | Classical | Available |
+| MU-006 | Bitches Brew | NORTH | Jazz | Borrowed |
+| MU-007 | Led Zeppelin IV | NORTH | Rock | Available |
+| MU-008 | The Planets | RIVER | Classical | Available |
+| MU-009 | Nevermind | RIVER | Rock | Available |
+| MU-010 | Kind of Blue | CENTRAL | Jazz | Damaged |
+| MU-011 | Time Out | RIVER | Jazz | Available |
+| MU-012 | Abbey Road | NORTH | Rock | Available |
+| TY-001 | Speed cube | CENTRAL | Puzzle | Destroy |
+| TY-002 | Classic brick box | CENTRAL | Building | Available |
+| TY-003 | 1000-piece map puzzle | CENTRAL | Puzzle | Borrowed |
+| TY-004 | Solar system jigsaw | NORTH | Puzzle | Borrowed |
+| TY-005 | Wooden building blocks | NORTH | Building | Available |
+| TY-006 | Tangram set | RIVER | Puzzle | Available |
+| TY-007 | Magnetic construction set | RIVER | Building | Damaged |
+| TY-008 | Wooden train set | RIVER | Building | Available |
+| TY-010 | Marble run set | NORTH | Building | Available |
 
-Statuses across the 45: about 32 Available, 7 Borrowed, 3 Damaged, 2 Destroy (never shown publicly), plus the items that are
-Available but in transit or held. Five items are **never borrowed** (idle for the inventory-health report).
-About 25 "filler" items are generated from a fixed list of real-sounding titles. The **scenario items** below are fixed.
-
-| Code | Item | Branch | Status / state | Used for |
-|---|---|---|---|---|
-| BK-001 | Dune (Frank Herbert, Science Fiction) | CENTRAL | Available | Kiosk checkout item 1 |
-| BK-002 | Neuromancer (William Gibson, Science Fiction) | CENTRAL | Available | Kiosk checkout item 2 |
-| MU-001 | Rumours (Fleetwood Mac, 1977, Rock) | CENTRAL | Available | Desk borrow + notification demo |
-| BK-010 | The Pragmatic Programmer (Programming) | CENTRAL | **Borrowed** by Emma, due D+6, **waitlist of 3** | Reservation demo: return it and the next patron is notified |
-| BK-011 | Clean Code (Programming) | CENTRAL | Available, **held (Ready)** for Ben until D+2 | Held-item protection: others cannot borrow it |
-| MU-010 | Kind of Blue (Miles Davis, 1959, Jazz) | CENTRAL | **Damaged**, Grace waiting | Admin sets it back to Available, so the next patron is notified |
-| BK-020 | The Hobbit (Fantasy) | CENTRAL | Borrowed by Daniel, **due D-12 (overdue)** | Fine accruing notification and report |
-| BK-021 | Foundation (Science Fiction) | CENTRAL | Borrowed by Daniel, **due D-5 (overdue)** | Fine accruing notification and report |
-| TY-003 | 1000-piece map puzzle (Puzzle, age 8+) | CENTRAL | Borrowed by Farid, **due D+2** | Due-soon notification |
-| MU-004 | The Four Seasons (Vivaldi, Classical) | NORTH | Borrowed by Farid, due D+5 | Not yet due soon; shows the check is date-based |
-| TY-005 | Wooden building blocks (Building, age 3+) | NORTH | Available, **expired hold** (Chloe) | Expired-hold history |
-| BK-030 | Piranesi (Fantasy) | CENTRAL | Available, **Requested** transfer to RIVER | Transfer list: requested |
-| MU-012 | Abbey Road (The Beatles, 1969, Rock) | CENTRAL (arriving) | **InTransit** from NORTH, dispatched D-2 | Cannot be borrowed; transfer list: in transit |
-| TY-010 | Marble run set (Building, age 6+) | NORTH | Available (arrived D-18 from RIVER), transfer **Received** | Transfer history |
-| BK-031 | A Short History of Nearly Everything (History) | CENTRAL | Available, transfer to NORTH **Cancelled** D-9 | Transfer history |
-| BK-032 | Project Hail Mary (Science Fiction) | CENTRAL | Available, **no transfer** | Live demo: request, dispatch and receive a transfer to NORTH |
-| BK-033 | The Martian (Science Fiction) | NORTH | Available | Same demo in the other direction |
-| BK-040 | An old atlas (History) | RIVER | Destroy | Must not appear in public search or the API |
+Items with status *Destroy* never appear in the public search or the API. Items with status *Damaged* are listed but cannot be lent.
 
 ## 5. Patrons (10)
 
 | Card | Name | PIN | Prefers | Story |
 |---|---|---|---|---|
-| LIB-1001 | Ava Thompson | 1111 | Email | Main kiosk demo patron; one normal loan due D+9; paid-up |
-| LIB-1002 | Ben Carter | 2222 | SMS | Has a **Ready** hold on BK-011 |
-| LIB-1003 | Chloe Nguyen | 3333 | Both | Two notifications per event; had an expired hold |
-| LIB-1004 | Daniel Okafor | 4444 | Email | **Two overdue loans with fines accruing** and one earlier unpaid fine of $3.00 |
-| LIB-1005 | Emma Rossi | 5555 | Email | **Five active loans** (the limit is not enforced; shows a full account summary); has BK-010 |
-| LIB-1006 | Farid Hassan | 6666 | SMS | Loan **due in 2 days** (due-soon notification) |
-| LIB-1007 | Grace Liu | 7777 | Email | Waitlist **position 1** for BK-010 and waiting on MU-010 |
-| LIB-1008 | Hugo Martin | 8888 | SMS | Waitlist position 2 for BK-010; one cancelled hold |
+| LIB-1001 | Ava Thompson | 1111 | Email | Main kiosk demo patron; one normal loan; paid up |
+| LIB-1002 | Ben Carter | 2222 | Sms | Has a **Ready** hold |
+| LIB-1003 | Chloe Nguyen | 3333 | Both | Prefers *Both*: two notifications per event; had an expired hold |
+| LIB-1004 | Daniel Okafor | 4444 | Email | **Two overdue loans** with fines accruing and an earlier unpaid fine |
+| LIB-1005 | Emma Rossi | 5555 | Email | **Five active loans**: full account summary |
+| LIB-1006 | Farid Hassan | 6666 | Sms | Loan **due in 2 days** (due-soon notification) |
+| LIB-1007 | Grace Liu | 7777 | Email | Waitlist position 1 for BK-010 |
+| LIB-1008 | Hugo Martin | 8888 | Sms | Waitlist position 2 for BK-010; one cancelled hold |
 | LIB-1009 | Isla Brown | 9999 | Both | Waitlist position 3 for BK-010 |
-| LIB-1010 | Jack Wilson | 0000 | Email | **Brand new, no loans, no holds** (empty states) and used for the wrong-PIN lockout demo |
+| LIB-1010 | Jack Wilson | 0000 | Email | Brand new: no loans, no holds (empty states); used for the wrong-PIN lock-out demo |
 
-## 6. Active loans at seed time
+## 6. Loans
 
-| Patron | Items | Borrowed | Due |
-|---|---|---|---|
-| Ava | one filler book | D-5 | D+9 |
-| Daniel | BK-020 | D-26 | D-12 (overdue 12 days = $6.00) |
-| Daniel | BK-021 | D-19 | D-5 (overdue 5 days = $2.50) |
-| Emma | BK-010 + 4 filler items | D-8 | D+6 |
-| Farid | TY-003 | D-12 | D+2 |
-| Farid | MU-004 | D-9 | D+5 |
+About 151 returned loans spread over the last 180 days across all branches (about 1 in 5 lent at a kiosk, some returned at a different branch, some late with fines, some paid), so the reports have real shapes. 10 loans are active:
 
-## 7. Loan history (for manager analytics)
+| Patron | Item | Branch | Borrowed | Due | Channel |
+|---|---|---|---|---|---|
+| Ava Thompson (LIB-1001) | BK-003 The Name of the Wind | CENTRAL | 2026-10-10 | 2026-10-24 | Desk |
+| Daniel Okafor (LIB-1004) | BK-020 The Hobbit | CENTRAL | 2026-09-19 | 2026-10-03 | Desk |
+| Daniel Okafor (LIB-1004) | BK-021 Foundation | CENTRAL | 2026-09-26 | 2026-10-10 | Desk |
+| Emma Rossi (LIB-1005) | BK-010 The Pragmatic Programmer | CENTRAL | 2026-10-07 | 2026-10-21 | Desk |
+| Emma Rossi (LIB-1005) | BK-005 Sapiens | NORTH | 2026-10-07 | 2026-10-21 | Desk |
+| Emma Rossi (LIB-1005) | BK-015 Refactoring | RIVER | 2026-10-07 | 2026-10-21 | Desk |
+| Emma Rossi (LIB-1005) | MU-006 Bitches Brew | NORTH | 2026-10-07 | 2026-10-21 | Desk |
+| Emma Rossi (LIB-1005) | TY-004 Solar system jigsaw | NORTH | 2026-10-07 | 2026-10-21 | Desk |
+| Farid Hassan (LIB-1006) | TY-003 1000-piece map puzzle | CENTRAL | 2026-10-03 | 2026-10-17 | Desk |
+| Farid Hassan (LIB-1006) | MU-004 The Four Seasons | NORTH | 2026-10-06 | 2026-10-20 | Desk |
 
-About **150 returned loans** over the last 180 days, generated deterministically:
+## 7. Transfers (one in every state)
 
-- Per month (oldest to newest): about 20, 22, 25, 27, 28, 28 loans (gentle growth, so trends show).
-- 55% books, 25% music, 20% toys; popular categories (Science Fiction, Rock) borrowed more than the rest.
-- About **80% returned on time**; the rest 1 to 14 days late, **fined $0.50 per full day**.
-- Fines: about **65% marked paid**, the rest outstanding (the older ones are mostly paid).
-- About 15% returned at a **different branch** from where they were borrowed; 4 returned damaged.
-- Spread over all branches, all desks and all patrons except Jack.
-
-## 8. Transfers (A)
-
-| State | Item | From | To | Dates |
+| Item | From | To | State | Note |
 |---|---|---|---|---|
-| Requested | BK-030 | CENTRAL | RIVER | requested D-1 |
-| InTransit | MU-012 | NORTH | CENTRAL | requested D-3, dispatched D-2 |
-| Received | TY-010 | RIVER | NORTH | requested D-22, received D-18 |
-| Cancelled | BK-031 | CENTRAL | NORTH | requested D-10, cancelled D-9 |
+| BK-030 Piranesi | CENTRAL | RIVER | Requested | Requested by a Riverside patron. |
+| MU-012 Abbey Road | NORTH | CENTRAL | InTransit | For the Beatles display. |
+| TY-010 Marble run set | RIVER | NORTH | Received |  |
+| BK-031 A Short History of Nearly Everything | CENTRAL | NORTH | Cancelled | Cancelled: the patron found a copy elsewhere. |
 
-## 9. Reservations (seeded by B)
+## 8. Reservations
 
-| Item | Patron | Status | Notes |
-|---|---|---|---|
-| BK-010 | Grace | Waiting, position 1 | created D-4 |
-| BK-010 | Hugo | Waiting, position 2 | created D-3 |
-| BK-010 | Isla | Waiting, position 3 | created D-1 |
-| BK-011 | Ben | **Ready** | created D-6, ready since D-1, expires D+2 |
-| TY-005 | Chloe | Expired | expired D-2 |
-| MU-003 | Hugo | Cancelled | cancelled D-7 |
-| MU-010 | Grace | Waiting, position 1 | item is Damaged |
-
-## 10. Notifications (seeded by B)
-
-About 20 notifications across the last 30 days: Borrowed (8), DueSoon (4), FineAccruing (3), ReservationReady (2),
-ReservationExpired (1), plus a couple on each channel, including Chloe's two-record "Both" example. Some patrons' notifications are
-generated live when B's scheduler runs against the loans above (for example Farid's due-soon).
-
-## 11. Sample files (seeded by C)
-
-`samples/import/`: a valid CSV (about 20 new items for RIVER), a CSV with bad rows covering every rule, a larger file, and the mock
-provider dataset. C also documents the demo API key.
-
-## 12. Which data each demo uses
-
-| # | Client demo item | Data used |
+| Item | Patron | State |
 |---|---|---|
-| 1 | Fresh install and startup | Whole seed; `admin` login |
-| 2 | Selecting a branch | `reception` chooses CENTRAL or NORTH; `reception.river` has one branch |
-| 3 | Kiosk checkout and account summary | Ava checks out BK-001 and BK-002; Emma's and Daniel's account summaries |
-| 4 | Public API requests | Items across 3 branches, 9 categories, branch hours; BK-040 must not appear |
-| 5 | Borrowing and notification logging | Ava borrows MU-001 at a desk and at the kiosk; notification appears |
-| 6 | Due-date and fine notification simulation | Farid (due D+2), Daniel (overdue); move simulated today forward |
-| 7 | Multi-branch inventory and transfer | Search by branch; BK-032 to NORTH; MU-012 in transit cannot be borrowed |
-| 8 | Reservation and next-person notification | Emma returns BK-010 at CENTRAL; Grace becomes Ready and is notified; Hugo cannot borrow it; admin repairs MU-010 |
-| 9 | CSV or external import | C's sample files into RIVER |
-| 10 | Manager analytics | The 180-day loan history, fines and idle items |
-| 11 | CSV and PDF exports | Same data, all three reports |
-| 12 | Database seeding/reset | `--reset-db` returns everything to this document |
+| BK-010 The Pragmatic Programmer | Grace Liu | Waiting |
+| BK-010 The Pragmatic Programmer | Hugo Martin | Waiting |
+| BK-010 The Pragmatic Programmer | Isla Brown | Waiting |
+| BK-011 Clean Code | Ben Carter | Ready |
+| TY-005 Wooden building blocks | Chloe Nguyen | Expired |
+| MU-003 The Dark Side of the Moon | Hugo Martin | Cancelled |
+| MU-010 Kind of Blue | Grace Liu | Waiting |
 
-## 13. Requests to B and C (please confirm at Meeting 1)
+## 9. Notifications
 
-- **B:** are the patrons, holds and loan dates above enough for the kiosk, notification and reservation demos? Do you need more
-  patrons, a patron with an expired PIN, or a loan on a different branch?
-- **C:** is 180 days of history, the fine mix and the idle items enough for the three reports? Which extra categories or
-  branches do your sample CSVs need? Which API key value do you want in the demo configuration?
+23 notifications are created, covering Borrowed (10), DueSoon (3), FineAccruing (5), ReservationReady (3), ReservationExpired (2), on both channels. More are generated live when the checks run.
 
-## 14. How it is built (A)
+## 10. Sample files
 
-`SeedRunner` runs these seeders in order: Branches (with hours and desks) -> Staff -> Categories -> Items -> Patrons -> Loan history and
-active loans -> Transfers -> **B's seeders** (Reservations, Notifications) -> **C's samples**. Each module registers its own
-seeder class, so nobody edits another person's seeder. Seeding is skipped when the database already has data, unless
-`--reset-db` is used.
+`samples/import/` holds the CSV files for the importer (see its README). The mock external provider has no file; it returns 12 records, 2 invalid.
+
+## 11. Which data each demo item uses
+
+See [`DEMO-WALKTHROUGH.md`](DEMO-WALKTHROUGH.md) for the 12 demo items with exact steps and the data each one uses.

@@ -1,0 +1,51 @@
+@model ItemPage
+@{ ViewData["Title"] = Model.Item.Name; var i = Model.Item; }
+<p><a href="javascript:history.back()">&larr; Back to results</a></p>
+<div class="card">
+  <span class="type-pill">@i.Type@(i.CategoryName != null ? " · " + i.CategoryName : "")</span>
+  <h1>@i.Name</h1>
+  @if (!string.IsNullOrWhiteSpace(i.Description)) { <p>@i.Description</p> }
+  <dl class="details">
+    @foreach (var d in i.Details) { <dt>@d.Key</dt><dd>@d.Value</dd> }
+    <dt>Library code</dt><dd><code>@i.LibraryCode</code></dd>
+    <dt>Branch</dt><dd>@i.BranchName</dd>
+    <dt>Availability</dt>
+    <dd>
+      <span class="badge @Fmt.StatusClass(i.Status, i.InTransit)">@Fmt.Status(i.Status, i.InTransit)</span>
+      @if (i.InTransit) { <span class="muted"> &mdash; moving between branches, can't be borrowed yet</span> }
+      @if (i.Status == ItemStatus.Damaged) { <span class="muted"> &mdash; being checked before it can be borrowed</span> }
+    </dd>
+    @if (Model.QueueLength > 0) { <dt>Waiting list</dt><dd>@Fmt.Plural(Model.QueueLength, "person", "people") waiting</dd> }
+  </dl>
+</div>
+
+@if (Model.Branch != null)
+{
+  <div class="card">
+    <h2>@Model.Branch.Name</h2>
+    <p class="muted">@Model.Branch.Address &middot; @Model.Branch.Phone</p>
+    <p><a href="/branches">See opening hours</a></p>
+  </div>
+}
+
+<div class="card">
+  <h2>Place a hold</h2>
+  @if (i.Status == ItemStatus.Available && !i.InTransit && Model.QueueLength == 0)
+  {
+    <p>This item is available now. Borrow it at <strong>@i.BranchName</strong> or at a kiosk there.</p>
+  }
+  else if (Model.PatronHasHold)
+  {
+    <p><span class="badge info">You have a hold on this item</span> &mdash; see <a href="/account">My account</a>.</p>
+  }
+  else if (Model.PatronSignedIn)
+  {
+    <p>We'll tell you when it's ready to collect.</p>
+    <form method="post" asp-antiforgery="true" action="/account/hold"><input type="hidden" name="code" value="@i.LibraryCode" /><button class="btn" type="submit">Place a hold</button></form>
+  }
+  else
+  {
+    <p>Holds are free. Sign in with your library card number and PIN.</p>
+    <a class="btn" href="/account/signin?returnUrl=/items/@i.LibraryCode">Sign in to place a hold</a>
+  }
+</div>

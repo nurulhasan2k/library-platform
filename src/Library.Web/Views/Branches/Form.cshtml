@@ -1,0 +1,32 @@
+@model BranchForm
+@{ var isNew = Model.Id == 0; ViewData["Title"] = isNew ? "Add a branch" : "Edit branch"; }
+<div class="card form">
+  <h1>@ViewData["Title"]</h1>
+  <form method="post" asp-antiforgery="true" action="@(isNew ? "/admin/branches/new" : $"/admin/branches/{Model.Id}/edit")">
+    <div class="form-row">
+      <div><label for="Code">Code</label><input id="Code" name="Code" type="text" value="@Model.Code" required maxlength="12" placeholder="EAST" /></div>
+      <div><label for="Name">Name</label><input id="Name" name="Name" type="text" value="@Model.Name" required /></div>
+    </div>
+    <div class="form-row">
+      <div><label for="Address">Address</label><input id="Address" name="Address" type="text" value="@Model.Address" /></div>
+      <div><label for="Phone">Phone</label><input id="Phone" name="Phone" type="text" value="@Model.Phone" /></div>
+    </div>
+    <label for="Desks">Reception desks (one per line)</label>
+    <textarea id="Desks" name="Desks">@Model.Desks</textarea>
+    <h3>Opening hours</h3>
+    <p class="field-hint">24-hour times such as 09:00 and 17:30. Leave both blank on a day when the branch is closed.</p>
+    <table class="table">
+      <thead><tr><th>Day</th><th>Opens</th><th>Closes</th></tr></thead>
+      @for (var i = 0; i < Model.Days.Count; i++)
+      {
+        <tr>
+          <td>@Model.Days[i].Day<input type="hidden" name="Days[@i].Day" value="@Model.Days[i].Day" /></td>
+          <td><input type="time" name="Days[@i].Open" value="@Model.Days[i].Open" aria-label="@Model.Days[i].Day opens" /></td>
+          <td><input type="time" name="Days[@i].Close" value="@Model.Days[i].Close" aria-label="@Model.Days[i].Day closes" /></td>
+        </tr>
+      }
+    </table>
+    <label class="check"><input type="checkbox" name="IsActive" value="true" checked="@Model.IsActive" /><input type="hidden" name="IsActive" value="false" /> This branch is open for business</label>
+    <p style="margin-top:1rem"><button class="btn" type="submit">Save</button> <a class="btn btn-ghost" href="/admin/branches">Cancel</a></p>
+  </form>
+</div>

@@ -1,0 +1,40 @@
+@model ReportService.Dashboard
+@{ ViewData["Title"] = "Reports"; var f = (ReportFilter)ViewBag.Filter; var branches = (IReadOnlyList<Library.Core.Models.Branch>)ViewBag.Branches;
+   string Q(string path) => $"{path}?from={f.From:yyyy-MM-dd}&to={f.To:yyyy-MM-dd}&branch={f.BranchId}"; 
+   decimal Max(IReadOnlyList<Bar> bars) => bars.Count == 0 ? 1 : Math.Max(1, bars.Max(b => b.Value)); }
+<div class="page-head"><h1>Manager dashboard</h1></div>
+<form method="get" class="filters">
+  <div><label for="from">From</label><input id="from" name="from" type="date" value="@f.From.ToString("yyyy-MM-dd")" /></div>
+  <div><label for="to">To</label><input id="to" name="to" type="date" value="@f.To.ToString("yyyy-MM-dd")" /></div>
+  <div><label for="branch">Branch</label><select id="branch" name="branch"><option value="">All branches</option>@foreach (var b in branches) { <option value="@b.Id" selected="@(f.BranchId == b.Id)">@b.Name</option> }</select></div>
+  <div><button class="btn" type="submit">Update</button></div>
+</form>
+<div class="grid grid-4">
+  <div class="stat"><div class="num">@Model.LoansLast30</div><div class="label">Loans in the last 30 days</div></div>
+  <div class="stat"><div class="num">@Model.ActiveLoans</div><div class="label">Items out now</div></div>
+  <div class="stat"><div class="num" style="color:var(--color-danger)">@Model.OverdueLoans</div><div class="label">Overdue now</div></div>
+  <div class="stat"><div class="num">@Fmt.Money(Model.OutstandingFines)</div><div class="label">Fines still unpaid</div></div>
+</div>
+<div class="grid grid-3" style="margin-top:1rem">
+  <div class="card">
+    <h2>Loans per month</h2>
+    <div class="bars">@foreach (var b in Model.LoansByMonth) { <div class="bar-row"><span>@b.Label</span><div class="bar-track"><div class="bar-fill" style="width:@((b.Value / Max(Model.LoansByMonth) * 100).ToString("0", System.Globalization.CultureInfo.InvariantCulture))%"></div></div><span class="bar-val">@b.Display</span></div> }</div>
+  </div>
+  <div class="card">
+    <h2>Loans by type</h2>
+    <div class="bars">@foreach (var b in Model.LoansByType) { <div class="bar-row"><span>@b.Label</span><div class="bar-track"><div class="bar-fill" style="width:@((b.Value / Max(Model.LoansByType) * 100).ToString("0", System.Globalization.CultureInfo.InvariantCulture))%"></div></div><span class="bar-val">@b.Display</span></div> }</div>
+  </div>
+  <div class="card">
+    <h2>Loans by branch</h2>
+    <div class="bars">@foreach (var b in Model.LoansByBranch) { <div class="bar-row"><span>@b.Label</span><div class="bar-track"><div class="bar-fill" style="width:@((b.Value / Max(Model.LoansByBranch) * 100).ToString("0", System.Globalization.CultureInfo.InvariantCulture))%"></div></div><span class="bar-val">@b.Display</span></div> }</div>
+  </div>
+</div>
+<h2>Full reports</h2>
+<div class="grid grid-3">
+  <div class="card"><h3>Borrowing statistics</h3><p class="muted">Loans by month, type, category and branch; the most borrowed items; on-time rate.</p>
+    <p class="actions"><a class="btn" href="@Q("/reports/borrowing")">View</a><a class="btn btn-ghost" href="@Q("/reports/borrowing")&format=csv">CSV</a><a class="btn btn-ghost" href="@Q("/reports/borrowing")&format=pdf">PDF</a></p></div>
+  <div class="card"><h3>Fine revenue</h3><p class="muted">Fines charged, collected and outstanding, by month and branch, and who owes what.</p>
+    <p class="actions"><a class="btn" href="@Q("/reports/fines")">View</a><a class="btn btn-ghost" href="@Q("/reports/fines")&format=csv">CSV</a><a class="btn btn-ghost" href="@Q("/reports/fines")&format=pdf">PDF</a></p></div>
+  <div class="card"><h3>Inventory health</h3><p class="muted">Stock by branch, idle items, damaged items, transfers and items people are waiting for.</p>
+    <p class="actions"><a class="btn" href="/reports/inventory?branch=@f.BranchId">View</a><a class="btn btn-ghost" href="/reports/inventory?branch=@f.BranchId&format=csv">CSV</a><a class="btn btn-ghost" href="/reports/inventory?branch=@f.BranchId&format=pdf">PDF</a></p></div>
+</div>

@@ -1,0 +1,22 @@
+@model List<KioskReceiptLine>
+@{ ViewData["Title"] = "Check out"; }
+<h1>Check out</h1>
+<div class="card">
+  <form method="post" asp-antiforgery="true" action="/kiosk/checkout" autocomplete="off">
+    <label for="code">Scan or type the item's library code, then press Enter</label>
+    <input id="code" name="code" type="text" placeholder="BK-001" autofocus />
+    <p style="margin-top:1rem"><button class="btn" type="submit">Check out this item</button></p>
+  </form>
+</div>
+<div class="card">
+  <h2>Checked out this visit (@Model.Count)</h2>
+  @if (Model.Count == 0) { <p class="muted">Nothing yet.</p> }
+  else
+  {
+    <ul class="checkout-list">
+      @foreach (var l in Model) { <li><span><strong>@l.Name</strong> <span class="muted">(@l.Code)</span></span><span>due @Fmt.Date(l.DueOn)</span></li> }
+    </ul>
+    <p style="margin-top:1rem"><a class="btn btn-ok" href="/kiosk/receipt">Done &mdash; show my receipt</a></p>
+  }
+  <p><a href="/kiosk/home">&larr; Back to my account</a></p>
+</div>

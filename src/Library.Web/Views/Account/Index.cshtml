@@ -1,0 +1,7 @@
+@model AccountSummary
+@{ ViewData["Title"] = "My account"; }
+<div class="page-head">
+  <div><h1>Hello, @Model.Name</h1><p class="muted">Card @Model.CardNumber</p></div>
+  <form method="post" asp-antiforgery="true" action="/account/signout"><button class="btn btn-ghost" type="submit">Sign out</button></form>
+</div>
+@await Html.PartialAsync("_AccountSummary", Model)
