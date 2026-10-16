@@ -1,0 +1,23 @@
+@model Library.Web.Models.Import.ImportPreviewViewModel
+@{ ViewData["Title"] = "Import preview"; }
+<h1>Import preview</h1>
+<p>@Model.Source: @Model.FileName</p>
+<p><strong>@Model.ValidCount valid</strong>, <strong>@Model.RejectedCount rejected</strong>. Nothing has been created.</p>
+<p>This preview expires at @Model.ExpiresAt.ToString("yyyy-MM-dd HH:mm"). Rows are checked again when you confirm.</p>
+<form asp-action="Confirm" method="post" asp-antiforgery="true">
+    <input type="hidden" name="Token" value="@Model.Token" />
+    <fieldset><legend>Import mode</legend>
+        <p><label><input type="radio" name="Mode" value="AllOrNothing" checked /> All or nothing: create nothing if any row is rejected.</label></p>
+        <p><label><input type="radio" name="Mode" value="SkipBadRows" /> Skip bad rows: create only valid rows.</label></p>
+    </fieldset>
+    <button type="submit">Confirm import</button>
+</form>
+<form asp-action="Cancel" method="post" asp-antiforgery="true">
+    <input type="hidden" name="Token" value="@Model.Token" /><button type="submit">Cancel</button>
+</form>
+<table class="table"><thead><tr><th>Row</th><th>Code</th><th>Name</th><th>Result</th><th>Reason</th></tr></thead><tbody>
+@foreach (var row in Model.Rows)
+{
+    <tr><td>@row.RowNumber</td><td>@row.Code</td><td>@row.Name</td><td>@(row.Valid ? "Valid" : "Rejected")</td><td>@row.Reason</td></tr>
+}
+</tbody></table>

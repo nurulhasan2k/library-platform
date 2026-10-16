@@ -1,0 +1,8 @@
+@model Library.Web.Models.Import.ImportBatchViewModel
+@{ ViewData["Title"] = "Import result"; }
+<h1>Import result</h1>
+<p>Batch @Model.Id: @Model.FileName (@Model.Source), @Model.At.ToString("yyyy-MM-dd HH:mm")</p>
+<p>@Model.RowsTotal total, <strong>@Model.RowsCreated created</strong>, <strong>@Model.RowsRejected rejected</strong>.</p>
+@if (Model.ErrorSummary is not null) { <p role="status">@Model.ErrorSummary</p> }
+@if (Model.HasErrorReport) { <p><a asp-action="Errors" asp-route-id="@Model.Id">Download error CSV</a></p> }
+<p><a asp-action="Index">Start another import</a> | <a asp-action="History">Import history</a></p>
