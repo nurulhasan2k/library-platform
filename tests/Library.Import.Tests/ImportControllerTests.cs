@@ -187,10 +187,11 @@ public sealed class ImportControllerTests
         }));
         var html = await client.GetStringAsync(response.Headers.Location);
         var preview = new Preview(response.Headers.Location!, Input(html, "Token"), Input(html, "__RequestVerificationToken"), html);
-        Assert.Contains("3 valid", html);
-        await Confirm(client, preview);
+        Assert.Contains("21 valid", html);
+        Assert.Contains("4 rejected", html);
+        await Confirm(client, preview, "SkipBadRows");
         var batch = Assert.Single(await Batches(factory));
-        Assert.Equal(3, batch.RowsCreated);
+        Assert.Equal(21, batch.RowsCreated);
         Assert.Equal(1, batch.TargetBranchId);
         Assert.Equal("MockProvider", batch.Source);
     }

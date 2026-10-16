@@ -1,6 +1,8 @@
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
+using System.Globalization;
+using CsvHelper;
 using Library.Core.Configuration;
 using Library.Core.Contracts;
 using Microsoft.Extensions.Options;
@@ -10,9 +12,28 @@ namespace Library.Core.Import;
 public sealed class ImportWorkflowService(
     CatalogueCsvValidator validator, ImportLookupAdapter lookups, ICatalogueCodeLookup codeLookup,
     ICatalogueQuery catalogue, ImportPreviewStore previews, IImportItemWriter writer,
-    IImportBatchStore batches, IClock clock, IOptions<ImportOptions> options)
+    IImportBatchStore batches, IClock clock, IOptions<ImportOptions> options, IExternalCatalogueProvider externalProvider)
 {
     public long MaximumBytes => options.Value.MaxFileSizeMb * 1024L * 1024L;
+
+    public async Task<ImportStartResult> StartExternalAsync(int targetBranchId, int userId, CancellationToken ct = default)
+    {
+        var source = await externalProvider.ReadAsync(ct);
+        if (source.Error is not null) return new(null, source.Error);
+        using var text = new StringWriter(CultureInfo.InvariantCulture);
+        using (var csv = new CsvWriter(text, CultureInfo.InvariantCulture, leaveOpen: true))
+        {
+            foreach (var column in CatalogueCsvValidator.Columns) csv.WriteField(column);
+            csv.NextRecord();
+            foreach (var row in source.Rows)
+            {
+                foreach (var column in CatalogueCsvValidator.Columns) csv.WriteField(row.GetValueOrDefault(column, ""));
+                csv.NextRecord();
+            }
+        }
+        return await StartAsync(new ImportSubmission(ImportSource.MockProvider, "regional-library-network.csv", "text/csv",
+            Encoding.UTF8.GetBytes(text.ToString()), targetBranchId), userId, ct);
+    }
 
     public string? CheckUpload(string fileName, long length, string contentType)
     {

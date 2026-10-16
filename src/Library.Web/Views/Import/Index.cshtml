@@ -3,10 +3,10 @@
 <h1>Import items</h1>
 @if (TempData["ImportMessage"] is string message) { <p role="status">@message</p> }
 <p><a asp-action="Template">Download CSV template</a> | <a asp-action="History">Import history</a></p>
-<p>Upload a CSV file, or use three sample items from the mock provider. Nothing is created until you confirm.</p>
+<p>Upload a CSV file, or use the simulated catalogue from the fictional Regional Library Network. This source reads a local sample file, not a live service. Nothing is created until you confirm.</p>
 <form asp-action="Index" method="post" enctype="multipart/form-data" asp-antiforgery="true">
     <p><label asp-for="Source">Source</label>
-        <select asp-for="Source"><option value="Csv">CSV file</option><option value="MockProvider">Mock provider</option></select></p>
+        <select asp-for="Source"><option value="Csv">CSV file</option><option value="MockProvider">Regional Library Network (simulated)</option></select></p>
     <p><label asp-for="File">CSV file</label> <input asp-for="File" type="file" accept=".csv,text/csv" /></p>
     <p><label asp-for="TargetBranchId">Target branch</label>
         <select asp-for="TargetBranchId"><option value="">Choose a branch</option>

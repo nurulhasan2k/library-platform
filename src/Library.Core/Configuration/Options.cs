@@ -67,6 +67,7 @@ public sealed class ImportOptions
     public const string Section = "Import";
     public int MaxFileSizeMb { get; set; } = 5;
     public int MaxRows { get; set; } = 5000;
+    public string MockProviderPath { get; set; } = "../../samples/import/mock-provider/catalogue.json";
 }
 
 public sealed class ReportOptions

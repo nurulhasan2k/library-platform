@@ -25,6 +25,7 @@ Settings are read from `src/Library.Web/appsettings.json`. Each section is bound
 | `Api:EnableSwagger` | `true` | Serve the OpenAPI document and Swagger UI. | C |
 | `Import:MaxFileSizeMb` | `5` | Largest CSV file the importer accepts. | C |
 | `Import:MaxRows` | `5000` | Largest number of data records accepted; blank lines do not count. | C |
+| `Import:MockProviderPath` | `../../samples/import/mock-provider/catalogue.json` | Local simulated Regional Library Network JSON file. Relative paths use the application's content root (`src/Library.Web` in this repo); absolute paths are also accepted. Set this to a deployed local file when publishing. No network request is made. | C |
 | `Reports:IdleItemDays` | `90` | An item not borrowed for this many days is "idle" in the inventory-health report. | C |
 
 ## Setting a secret (API key example)

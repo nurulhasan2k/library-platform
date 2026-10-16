@@ -20,6 +20,7 @@ public static class ImportServiceCollectionExtensions
         services.TryAddSingleton<ImportPreviewStore>();
         services.TryAddSingleton<IImportBatchStore, InMemoryImportBatchStore>();
         services.TryAddScoped<ImportWorkflowService>();
+        services.TryAddScoped<IExternalCatalogueProvider, MockImportProvider>();
         return services;
     }
 }

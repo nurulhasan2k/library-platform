@@ -40,7 +40,7 @@ public sealed record ImportBatchViewModel(
 internal static class ImportViewModelMapper
 {
     public static ImportPreviewViewModel Preview(PendingImport preview)
-        => new(preview.Token, preview.Submission.Source == ImportSource.Csv ? "CSV" : "Mock provider",
+        => new(preview.Token, preview.Submission.Source == ImportSource.Csv ? "CSV" : "Regional Library Network (simulated)",
             preview.Submission.FileName, preview.ExpiresAt, preview.Validation.ValidRows.Count, preview.Validation.RejectedRows.Count,
             preview.Validation.ValidRows.Select(row => new ImportPreviewRowViewModel(row.RowNumber, row.LibraryCode, row.Name, true, "Ready"))
                 .Concat(preview.Validation.RejectedRows.Select(row => new ImportPreviewRowViewModel(row.RowNumber,
@@ -48,7 +48,7 @@ internal static class ImportViewModelMapper
                 .OrderBy(row => row.RowNumber).ToArray());
 
     public static ImportBatchViewModel Batch(ImportBatch batch)
-        => new(batch.Id, batch.Source == nameof(ImportSource.Csv) ? "CSV" : "Mock provider", batch.FileName,
+        => new(batch.Id, batch.Source == nameof(ImportSource.Csv) ? "CSV" : "Regional Library Network (simulated)", batch.FileName,
             batch.ByUserId, batch.At, batch.RowsTotal, batch.RowsCreated, batch.RowsRejected,
             batch.ErrorSummary, batch.TargetBranchId, batch.ErrorReport is not null);
 }

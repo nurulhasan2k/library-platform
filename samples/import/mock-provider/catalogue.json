@@ -1,0 +1,280 @@
+{
+  "provider": "Regional Library Network",
+  "simulated": true,
+  "items": [
+    {
+      "libraryCode": "BK-600",
+      "itemType": "book",
+      "name": "Regional sample 1",
+      "description": "Fictional Regional Library Network catalogue item",
+      "branch": "",
+      "status": "Available",
+      "category": "Science Fiction",
+      "author": "Regional Writer",
+      "genre": "Science Fiction"
+    },
+    {
+      "libraryCode": "MU-601",
+      "itemType": "music",
+      "name": "Regional sample 2",
+      "description": "Fictional Regional Library Network catalogue item",
+      "branch": "",
+      "status": "Available",
+      "category": "Rock",
+      "artist": "Regional Ensemble",
+      "year": 2000
+    },
+    {
+      "libraryCode": "TY-602",
+      "itemType": "toy",
+      "name": "Regional sample 3",
+      "description": "Fictional Regional Library Network catalogue item",
+      "branch": "",
+      "status": "Available",
+      "category": "Puzzle",
+      "toyType": "Puzzle",
+      "recommendedAge": 6
+    },
+    {
+      "libraryCode": "BK-603",
+      "itemType": "book",
+      "name": "Regional sample 4",
+      "description": "Fictional Regional Library Network catalogue item",
+      "branch": "",
+      "status": "Available",
+      "category": "Science Fiction",
+      "author": "Regional Writer",
+      "genre": "Science Fiction"
+    },
+    {
+      "libraryCode": "MU-604",
+      "itemType": "music",
+      "name": "Regional sample 5",
+      "description": "Fictional Regional Library Network catalogue item",
+      "branch": "",
+      "status": "Available",
+      "category": "Rock",
+      "artist": "Regional Ensemble",
+      "year": 2000
+    },
+    {
+      "libraryCode": "TY-605",
+      "itemType": "toy",
+      "name": "Regional sample 6",
+      "description": "Fictional Regional Library Network catalogue item",
+      "branch": "",
+      "status": "Available",
+      "category": "Puzzle",
+      "toyType": "Puzzle",
+      "recommendedAge": 6
+    },
+    {
+      "libraryCode": "BK-606",
+      "itemType": "book",
+      "name": "Regional sample 7",
+      "description": "Fictional Regional Library Network catalogue item",
+      "branch": "",
+      "status": "Available",
+      "category": "Science Fiction",
+      "author": "Regional Writer",
+      "genre": "Science Fiction"
+    },
+    {
+      "libraryCode": "MU-607",
+      "itemType": "music",
+      "name": "Regional sample 8",
+      "description": "Fictional Regional Library Network catalogue item",
+      "branch": "",
+      "status": "Available",
+      "category": "Rock",
+      "artist": "Regional Ensemble",
+      "year": 2000
+    },
+    {
+      "libraryCode": "TY-608",
+      "itemType": "toy",
+      "name": "Regional sample 9",
+      "description": "Fictional Regional Library Network catalogue item",
+      "branch": "",
+      "status": "Available",
+      "category": "Puzzle",
+      "toyType": "Puzzle",
+      "recommendedAge": 6
+    },
+    {
+      "libraryCode": "BK-609",
+      "itemType": "book",
+      "name": "Regional sample 10",
+      "description": "Fictional Regional Library Network catalogue item",
+      "branch": "",
+      "status": "Available",
+      "category": "Science Fiction",
+      "author": "Regional Writer",
+      "genre": "Science Fiction"
+    },
+    {
+      "libraryCode": "MU-610",
+      "itemType": "music",
+      "name": "Regional sample 11",
+      "description": "Fictional Regional Library Network catalogue item",
+      "branch": "",
+      "status": "Available",
+      "category": "Rock",
+      "artist": "Regional Ensemble",
+      "year": 2000
+    },
+    {
+      "libraryCode": "TY-611",
+      "itemType": "toy",
+      "name": "Regional sample 12",
+      "description": "Fictional Regional Library Network catalogue item",
+      "branch": "",
+      "status": "Available",
+      "category": "Puzzle",
+      "toyType": "Puzzle",
+      "recommendedAge": 6
+    },
+    {
+      "libraryCode": "BK-612",
+      "itemType": "book",
+      "name": "Regional sample 13",
+      "description": "Fictional Regional Library Network catalogue item",
+      "branch": "",
+      "status": "Available",
+      "category": "Science Fiction",
+      "author": "Regional Writer",
+      "genre": "Science Fiction"
+    },
+    {
+      "libraryCode": "MU-613",
+      "itemType": "music",
+      "name": "Regional sample 14",
+      "description": "Fictional Regional Library Network catalogue item",
+      "branch": "",
+      "status": "Available",
+      "category": "Rock",
+      "artist": "Regional Ensemble",
+      "year": 2000
+    },
+    {
+      "libraryCode": "TY-614",
+      "itemType": "toy",
+      "name": "Regional sample 15",
+      "description": "Fictional Regional Library Network catalogue item",
+      "branch": "",
+      "status": "Available",
+      "category": "Puzzle",
+      "toyType": "Puzzle",
+      "recommendedAge": 6
+    },
+    {
+      "libraryCode": "BK-615",
+      "itemType": "book",
+      "name": "Regional sample 16",
+      "description": "Fictional Regional Library Network catalogue item",
+      "branch": "",
+      "status": "Available",
+      "category": "Science Fiction",
+      "author": "Regional Writer",
+      "genre": "Science Fiction"
+    },
+    {
+      "libraryCode": "MU-616",
+      "itemType": "music",
+      "name": "Regional sample 17",
+      "description": "Fictional Regional Library Network catalogue item",
+      "branch": "",
+      "status": "Available",
+      "category": "Rock",
+      "artist": "Regional Ensemble",
+      "year": 2000
+    },
+    {
+      "libraryCode": "TY-617",
+      "itemType": "toy",
+      "name": "Regional sample 18",
+      "description": "Fictional Regional Library Network catalogue item",
+      "branch": "",
+      "status": "Available",
+      "category": "Puzzle",
+      "toyType": "Puzzle",
+      "recommendedAge": 6
+    },
+    {
+      "libraryCode": "BK-618",
+      "itemType": "book",
+      "name": "Regional sample 19",
+      "description": "Fictional Regional Library Network catalogue item",
+      "branch": "",
+      "status": "Available",
+      "category": "Science Fiction",
+      "author": "Regional Writer",
+      "genre": "Science Fiction"
+    },
+    {
+      "libraryCode": "MU-619",
+      "itemType": "music",
+      "name": "Regional sample 20",
+      "description": "Fictional Regional Library Network catalogue item",
+      "branch": "",
+      "status": "Available",
+      "category": "Rock",
+      "artist": "Regional Ensemble",
+      "year": 2000
+    },
+    {
+      "libraryCode": "TY-620",
+      "itemType": "toy",
+      "name": "Regional sample 21",
+      "description": "Fictional Regional Library Network catalogue item",
+      "branch": "",
+      "status": "Available",
+      "category": "Puzzle",
+      "toyType": "Puzzle",
+      "recommendedAge": 6
+    },
+    {
+      "libraryCode": "BK-625",
+      "itemType": "dvd",
+      "name": "Invalid item type",
+      "description": "Fictional Regional Library Network catalogue item",
+      "branch": "",
+      "status": "Available",
+      "category": "Science Fiction",
+      "author": "Regional Writer",
+      "genre": "Science Fiction"
+    },
+    {
+      "libraryCode": "BK-626",
+      "itemType": "book",
+      "name": "Unknown category",
+      "description": "Fictional Regional Library Network catalogue item",
+      "branch": "",
+      "status": "Available",
+      "category": "Cooking",
+      "author": "Regional Writer",
+      "genre": "Science Fiction"
+    },
+    {
+      "libraryCode": " bk-600 ",
+      "itemType": "book",
+      "name": "Duplicate code",
+      "description": "Fictional Regional Library Network catalogue item",
+      "branch": "",
+      "status": "Available",
+      "category": "Science Fiction",
+      "author": "Regional Writer",
+      "genre": "Science Fiction"
+    },
+    {
+      "libraryCode": "BK-628",
+      "itemType": "book",
+      "description": "Fictional Regional Library Network catalogue item",
+      "branch": "",
+      "status": "Available",
+      "category": "Science Fiction",
+      "author": "Regional Writer",
+      "genre": "Science Fiction"
+    }
+  ]
+}

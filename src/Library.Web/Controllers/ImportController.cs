@@ -29,9 +29,8 @@ public sealed class ImportController(ImportWorkflowService imports, IImportBatch
         string contentType;
         if (model.Source == ImportSource.MockProvider)
         {
-            content = MockImportProvider.GetCsv();
-            fileName = "mock-provider.csv";
-            contentType = "text/csv";
+            var external = await imports.StartExternalAsync(model.TargetBranchId, UserId, ct);
+            return external.Token is null ? Notice(external.Error!) : RedirectToAction(nameof(Preview), new { token = external.Token });
         }
         else
         {
