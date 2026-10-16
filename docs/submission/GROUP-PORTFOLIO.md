@@ -97,7 +97,7 @@ R = responsible (leads), S = supplies a part, V = reviews.
 | Md Modasser Hossain | 4 | 63 | 70 | 137 |
 | Team | 17 | 200 | 174 | 391 |
 
-The full task list is Appendix A of the Project Plan.
+The full task list is Appendix A of the Project Plan, and the Plan's section 7.1 records who committed what, from the Git history.
 
 ### 2.4 Risk register
 

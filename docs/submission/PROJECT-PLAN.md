@@ -128,6 +128,18 @@ Estimates come from the project board (68 cards). The *Hours logged* columns are
 | Md Modasser Hossain | 4 | 63 | 70 | 137 | |
 | **Team** | | | | **391** | |
 
+### 7.1 Contribution record
+
+The work was **planned** as an equal three-way split: the board estimates are 125, 129 and 137 hours, which is 32%, 33% and 35% of the 391-hour total, and each member owned a third of the client features. What each member actually contributed is recorded below from the Git history (all branches, to 16 October 2026). Commit counts are only one measure; hours and the work itself are the others.
+
+| Team member | Commits | Work recorded in the repository | Hours logged |
+|---|---|---|---|
+| Mohammed Nurul Hasan (S376146) | 3 | Initial solution skeleton, shared service contracts and kickoff documents; project board and team process; the integrated build of the whole platform with its automated tests, scripts, sample files, documentation and the submission documents | |
+| Md Rakibul Hassan Emon (S375332) | 1 | Kiosk, notifications and reservations (pull request #70) | |
+| Md Modasser Hossain (S375173) | 11 | Public API: pipeline with key check, rate limit, CORS and JSON errors; items, categories, branches and status endpoints; error handling; endpoint and pipeline tests. Importer: CSV validation, sample files, admin import screens with preview, confirm, history and error download, simulated provider. Manager reports with calculators, exports and screens | |
+
+**How the pieces fit.** Rakibul's and Modasser's feature work was built in parallel against the shared contracts and the original plan, and is kept in the repository history. The version submitted is the integrated build committed by Mohammed, which brings all seven features and the baseline into one application, so the submitted code is not the same code as the earlier feature branches. Hours and individual reflections are for each member to complete.
+
 Delivered differently from the first plan: card A3 ("EF Core + SQLite") was delivered as a JSON store behind `ILibraryStore`, and cards C5, C12 (CSV/PDF libraries, Swagger) were delivered with hand-written code. The reasons and the trade-off are decisions D1, D11 and D12 in `docs/DECISIONS.md`.
 
 ## 8. Meetings and minutes
