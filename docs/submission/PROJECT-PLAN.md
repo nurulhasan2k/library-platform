@@ -10,7 +10,7 @@
 | Team | Three members (section 2) |
 | Repository | <https://github.com/nurulhasan2k/library-platform.git> (branch `main`) |
 | Project board | GitHub Projects board of the same repository: 68 cards, one per task, each with an owner, milestone and estimate |
-| Submission | [submission date and time to be added by the team] |
+| Submission | 16 October 2026, 23:59 |
 | Status at the date of this plan | All seven features and the baseline are built, integrated and tested. Remaining: test on the assessor's virtual machine image and final read-through. |
 
 ## 2. Team and responsibilities
@@ -54,9 +54,9 @@ Every client requirement has exactly one owner (the traceability matrix is in th
 
 | Member | Agreed (name and date) |
 |---|---|
-| Mohammed Nurul Hasan (S376146) | |
-| Md Rakibul Hassan Emon (S375332) | |
-| Md Modasser Hossain (S375173) | |
+| Mohammed Nurul Hasan (S376146) | Agreed, by message to the team, 16 Oct 2026 |
+| Md Rakibul Hassan Emon (S375332) | Agreed, by message to the team, 16 Oct 2026 |
+| Md Modasser Hossain (S375173) | Agreed, by message to the team, 16 Oct 2026 |
 
 ## 4. Requirements notes
 
@@ -114,19 +114,19 @@ Every client requirement has exactly one owner (the traceability matrix is in th
 | Source repository | <https://github.com/nurulhasan2k/library-platform.git>, branch `main` |
 | Project board | The repository's **Projects** tab (GitHub Projects): 68 cards, each with an owner, a milestone (M1, M2, M3) and an hours estimate |
 | Documentation | `README.md`, and the `docs/` folder (installation, user guide, architecture, decisions, data model, seed data, configuration, demo walkthrough) |
-| Marker access | [Add the marker's GitHub username as a collaborator, or make the repository public, and write the invitation date here] |
-| Chat | [Name of the team chat tool and channel] |
+| Marker access | The repository is public, so no invitation is needed (made public 16 October 2026) |
+| Chat | Facebook Messenger (group chat) |
 
 ## 7. Billable tasks and hours
 
-Estimates come from the project board (68 cards). The *Hours logged* columns are for each member to complete with the hours they actually spent; the full task list is in Appendix A.
+Estimates come from the project board (68 cards). The *Hours logged* column shows the hours each member reports having actually spent (rough totals given by the members themselves, not timesheets); a blank means not yet provided; the full task list is in Appendix A.
 
 | Team member | Milestone 1 (kickoff) | Milestone 2 (midpoint) | Milestone 3 (final) | Estimated total | Hours logged |
 |---|---|---|---|---|---|
-| Mohammed Nurul Hasan | 7 | 78 | 40 | 125 | |
-| Md Rakibul Hassan Emon | 6 | 59 | 64 | 129 | |
-| Md Modasser Hossain | 4 | 63 | 70 | 137 | |
-| **Team** | | | | **391** | |
+| Mohammed Nurul Hasan | 7 | 78 | 40 | 125 | about 20 (self-reported) |
+| Md Rakibul Hassan Emon | 6 | 59 | 64 | 129 | about 13 (self-reported) |
+| Md Modasser Hossain | 4 | 63 | 70 | 137 | about 16 (self-reported) |
+| **Team** | | | | **391** | about 49 (self-reported) |
 
 ### 7.1 Contribution record
 
@@ -134,11 +134,15 @@ The work was **planned** as an equal three-way split: the board estimates are 12
 
 | Team member | Commits | Work recorded in the repository | Hours logged |
 |---|---|---|---|
-| Mohammed Nurul Hasan (S376146) | 3 | Initial solution skeleton, shared service contracts and kickoff documents; project board and team process; the integrated build of the whole platform with its automated tests, scripts, sample files, documentation and the submission documents | |
-| Md Rakibul Hassan Emon (S375332) | 1 | Kiosk, notifications and reservations (pull request #70) | |
-| Md Modasser Hossain (S375173) | 11 | Public API: pipeline with key check, rate limit, CORS and JSON errors; items, categories, branches and status endpoints; error handling; endpoint and pipeline tests. Importer: CSV validation, sample files, admin import screens with preview, confirm, history and error download, simulated provider. Manager reports with calculators, exports and screens | |
+| Mohammed Nurul Hasan (S376146) | 3 | Initial solution skeleton, shared service contracts and kickoff documents; project board and team process; the integrated build of the whole platform with its automated tests, scripts, sample files, documentation and the submission documents. Self-reported: solution structure and project skeleton; shared service contracts; initial documentation and kickoff materials; repository link in the README; integrating all seven features into the final application; checking that the components work together; reviewing and consolidating the tests and documentation. Work ran from 7 to 16 October 2026 | about 20 (self-reported) |
+| Md Rakibul Hassan Emon (S375332) | 1 | Kiosk, notifications and reservations (pull request #70). Self-reported: the kiosk, the notification features and the reservation functionality; fitting them into the application structure; checking the functionality and fixing integration issues. Work was mostly on the kiosk, notifications and reservations | about 13 (self-reported) |
+| Md Modasser Hossain (S375173) | 11 | Public API: pipeline with key check, rate limit, CORS and JSON errors; items, categories, branches and status endpoints; error handling; endpoint and pipeline tests. Importer: CSV validation, sample files, admin import screens with preview, confirm, history and error download, simulated provider. Manager reports with calculators, exports and screens. Self-reported: most of the work in the week of 12 to 16 October 2026, including debugging, integration and verification | about 16 (self-reported) |
 
-**How the pieces fit.** Rakibul's and Modasser's feature work was built in parallel against the shared contracts and the original plan, and is kept in the repository history. The version submitted is the integrated build committed by Mohammed, which brings all seven features and the baseline into one application, so the submitted code is not the same code as the earlier feature branches. Hours and individual reflections are for each member to complete.
+### 7.2 Use of AI assistance
+
+The integrated build that is submitted (the combined application, its automated tests, the scripts, sample import files, the documentation and these submission documents) was produced with the help of Claude, an AI assistant made by Anthropic, working from the team's Assignment 2 baseline, shared contracts and feature plan. Mohammed Nurul Hasan directed that work, ran the result and committed it. The AI assistant also helped draft the planning and documentation text. Rakibul and Modasser each wrote their own feature branches earlier; Mohammed reports that neither of them used any AI tool for their feature branches. Anyone marking this work should treat the integrated build as AI-assisted.
+
+**How the pieces fit.** Rakibul's and Modasser's feature work was built in parallel against the shared contracts and the original plan, and is kept in the repository history. The version submitted is the integrated build committed by Mohammed, which brings all seven features and the baseline into one application, so the submitted code is not the same code as the earlier feature branches. Hours are rough self-reported totals; individual reflections are in section 9.3.
 
 Delivered differently from the first plan: card A3 ("EF Core + SQLite") was delivered as a JSON store behind `ILibraryStore`, and cards C5, C12 (CSV/PDF libraries, Swagger) were delivered with hand-written code. The reasons and the trade-off are decisions D1, D11 and D12 in `docs/DECISIONS.md`.
 
@@ -176,17 +180,17 @@ No minutes exist for meetings that did not take place, and none have been writte
 
 **Strengths:** the contract-first approach and the shared review rules kept three people's work compatible; the project board gave every task an owner and an estimate; the seed scenarios were agreed before the features were built so every demo has data.
 
-**Weaknesses:** the three planned meetings were not held, so decisions have no minutes and were recorded only in the decision log; hours were estimated rather than logged as the work happened.
+**Weaknesses:** the three planned meetings were not held, so decisions have no minutes and were recorded only in the decision log; hours were estimated rather than logged as the work happened, and the hours reported at the end are much lower than the 391-hour board estimate, so the estimates were not a reliable guide to the real effort.
 
 ### 9.3 Individual reflections
 
-Each member writes their own paragraph (what they did, what went well, what they would do differently).
+Each member's own words, lightly shortened.
 
 | Member | Reflection |
 |---|---|
-| Mohammed Nurul Hasan (S376146) | |
-| Md Rakibul Hassan Emon (S375332) | |
-| Md Modasser Hossain (S375173) | |
+| Mohammed Nurul Hasan (S376146) | What went well: dividing the project into separate features, developing them collaboratively, then bringing everything together. Challenge: integrating the components into one working application in the time available, especially keeping the features built by different members consistent. Next time: set clearer integration milestones and do integration testing earlier so compatibility problems show up before the final stage. |
+| Md Rakibul Hassan Emon (S375332) | What went well: implementing several user-facing features that support the library's day-to-day operations. Challenge: making the kiosk, notifications and reservations work consistently with the rest of the application. Next time: allow more time for integration testing and coordinate feature development earlier so the final integration is smoother. |
+| Md Modasser Hossain (S375173) | What went well: building several backend features and connecting them with the platform's administrative and reporting functions. Challenge: keeping API behaviour, validation and error handling consistent across components. Next time: set up a more structured testing and integration process earlier so problems show up sooner. |
 
 <<<pagebreak>>>
 
