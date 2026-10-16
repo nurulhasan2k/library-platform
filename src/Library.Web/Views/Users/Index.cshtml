@@ -1,0 +1,40 @@
+@model IReadOnlyList<User>
+@{ ViewData["Title"] = "Staff"; var branches = (IReadOnlyList<Branch>)ViewBag.Branches; }
+<h1>Staff accounts</h1>
+<div class="card">
+  <h2>Add a staff member</h2>
+  <form method="post" asp-antiforgery="true" action="/admin/users/new" class="form">
+    <div class="form-row">
+      <div><label for="username">Username</label><input id="username" name="username" type="text" required autocomplete="off" /></div>
+      <div><label for="password">Password (6+ characters)</label><input id="password" name="password" type="password" required autocomplete="new-password" /></div>
+    </div>
+    <label for="role">Role</label>
+    <select id="role" name="role">@foreach (var r in Enum.GetValues<UserRole>()) { <option value="@r">@r</option> }</select>
+    <fieldset style="border:0;padding:0;margin:.6rem 0"><legend style="font-weight:600">Branches they may work at (none ticked = all)</legend>
+      @foreach (var b in branches) { <label class="check"><input type="checkbox" name="branchIds" value="@b.Id" /> @b.Name</label> }
+    </fieldset>
+    <button class="btn" type="submit">Add</button>
+  </form>
+</div>
+<div class="table-wrap"><table class="table stack">
+  <thead><tr><th>Username</th><th>Role</th><th>Branches</th><th>Change password</th><th></th></tr></thead>
+  <tbody>
+  @foreach (var u in Model)
+  {
+    <tr>
+      <td data-label="Username"><strong>@u.Username</strong></td><td data-label="Role"><span class="badge info">@u.Role</span></td>
+      <td data-label="Branches">
+        @if (u.Role == UserRole.Manager) { <span class="muted">not needed</span> }
+        else
+        {
+          <form method="post" asp-antiforgery="true" action="/admin/users/@u.Id/branches">
+            @foreach (var b in branches) { <label class="check"><input type="checkbox" name="branchIds" value="@b.Id" checked="@u.BranchIds.Contains(b.Id)" /> @b.Code</label> }
+            <button class="btn btn-ghost btn-sm" type="submit">Save</button> <span class="small muted">@(u.BranchIds.Count == 0 ? "all branches" : "")</span>
+          </form>
+        }
+      </td>
+      <td data-label="Password"><form method="post" asp-antiforgery="true" action="/admin/users/@u.Id/password" class="actions"><input type="password" name="password" placeholder="New password" style="max-width:180px" aria-label="New password" autocomplete="new-password" /><button class="btn btn-ghost btn-sm" type="submit">Change</button></form></td>
+      <td class="right"><form method="post" asp-antiforgery="true" action="/admin/users/@u.Id/delete" onsubmit="return confirm('Delete @u.Username?')"><button class="btn btn-danger btn-sm" type="submit">Delete</button></form></td>
+    </tr>
+  }
+  </tbody></table></div>

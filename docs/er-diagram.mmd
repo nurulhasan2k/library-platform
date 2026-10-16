@@ -1,20 +1,20 @@
 erDiagram
-    BRANCH ||--o{ OPENING_HOURS : "has"
-    BRANCH ||--o{ RECEPTION_DESK : "has"
+    BRANCH ||--o{ OPENING_HOURS : "has (stored inside the branch)"
+    BRANCH ||--o{ DESK : "has (stored inside the branch)"
     BRANCH ||--o{ ITEM : "holds (physical location)"
-    BRANCH ||--o{ USER_BRANCH : "staff may work at"
-    USER ||--o{ USER_BRANCH : "assigned to"
+    BRANCH ||--o{ LOAN : "lent at"
+    USER }o--o{ BRANCH : "may work at"
     CATEGORY ||--o{ ITEM : "classifies"
     ITEM ||--o{ LOAN : "is lent in"
     BORROWER ||--o{ LOAN : "borrows"
-    RECEPTION_DESK |o--o{ LOAN : "processed at"
+    DESK |o--o{ LOAN : "processed at"
     ITEM ||--o{ TRANSFER : "moves via"
     BRANCH ||--o{ TRANSFER : "from / to"
     ITEM ||--o{ RESERVATION : "is held by"
     BORROWER ||--o{ RESERVATION : "places"
     BORROWER ||--o{ NOTIFICATION : "receives"
     LOAN |o--o{ NOTIFICATION : "about"
-    USER ||--o{ IMPORT_BATCH : "runs"
+    BRANCH ||--o{ IMPORT_BATCH : "imported into"
 
     BRANCH {
         int Id PK
@@ -25,15 +25,13 @@ erDiagram
         bool IsActive
     }
     OPENING_HOURS {
-        int Id PK
-        int BranchId FK
-        int DayOfWeek
-        time OpenTime "null = closed"
-        time CloseTime "null = closed"
+        string Day
+        time Open
+        time Close
+        bool IsClosed
     }
-    RECEPTION_DESK {
+    DESK {
         int Id PK
-        int BranchId FK
         string Name
     }
     CATEGORY {
@@ -46,7 +44,7 @@ erDiagram
         string LibraryCode UK "one code = one physical copy"
         string Name
         string Description
-        string ItemType "Book / Music / Toy"
+        string Type "Book / Music / Toy"
         string Status "Available / Borrowed / Damaged / Destroy"
         int BranchId FK "where the copy is now"
         int CategoryId FK
@@ -61,36 +59,36 @@ erDiagram
         int Id PK
         string CardNumber UK
         string PinHash
-        string FullName
+        string Name
         string Email
         string Phone
+        string Address
         string PreferredChannel "Email / Sms / Both"
+        int FailedPinAttempts
+        datetime LockedUntil
     }
     LOAN {
         int Id PK
         int ItemId FK
         int BorrowerId FK
+        int BranchId FK "where it was lent"
+        int DeskId FK
+        string Channel "Desk / Kiosk"
         date BorrowedOn
         date DueOn
         date ReturnedOn "null = active"
+        int ReturnBranchId FK
+        bool ReturnedDamaged
         decimal FineAmount
         bool FinePaid
         date FinePaidOn
-        int BorrowedAtBranchId FK
-        int ReturnedAtBranchId FK
-        int DeskId FK
-        bool ReturnedDamaged
     }
     USER {
         int Id PK
         string Username UK
         string PasswordHash
         string Role "Admin / Reception / Manager"
-        string FullName
-    }
-    USER_BRANCH {
-        int UserId FK
-        int BranchId FK
+        list BranchIds
     }
     TRANSFER {
         int Id PK
@@ -98,10 +96,11 @@ erDiagram
         int FromBranchId FK
         int ToBranchId FK
         string Status "Requested / InTransit / Received / Cancelled"
-        datetime RequestedAt
         int RequestedByUserId FK
+        datetime RequestedAt
         datetime DispatchedAt
         datetime ReceivedAt
+        datetime CancelledAt
         string Note
     }
     RESERVATION {
@@ -109,37 +108,37 @@ erDiagram
         int ItemId FK
         int BorrowerId FK
         string Status "Waiting / Ready / Fulfilled / Cancelled / Expired"
+        string Source "Kiosk / Web / Desk"
         datetime CreatedAt
-        datetime NotifiedAt
+        datetime ReadyAt
         datetime ExpiresAt
-        string PlacedVia "Kiosk / Web / Desk"
+        datetime ClosedAt
     }
     NOTIFICATION {
         int Id PK
-        string Type
+        string Type "Borrowed / DueSoon / FineAccruing / ReservationReady / ReservationExpired"
         string Channel "Email / Sms"
         int BorrowerId FK
         int ItemId FK
         int LoanId FK
+        int ReservationId FK
         string Recipient
         string Subject
         string Body
         datetime CreatedAt
-        string Status "Simulated sent"
-        string DedupeKey UK
+        string DedupKey "stops duplicates"
     }
     IMPORT_BATCH {
         int Id PK
-        string Source "Csv / MockProvider"
-        string FileName
-        int ByUserId FK
-        datetime At
-        int RowsTotal
-        int RowsCreated
-        int RowsRejected
-        string ErrorSummary
+        string Source "Csv file name / Mock provider"
+        int BranchId FK
+        string ImportedBy
+        datetime ImportedAt
+        int TotalRows
+        int ImportedRows
+        int SkippedRows
+        list Problems
     }
-    APP_SETTING {
-        string Key PK
-        string Value "for example SimulatedToday"
+    SETTINGS {
+        date SimulatedToday "admin simulated date"
     }

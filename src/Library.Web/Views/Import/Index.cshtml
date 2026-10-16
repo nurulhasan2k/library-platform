@@ -1,0 +1,44 @@
+@{ ViewData["Title"] = "Import"; var branches = (IReadOnlyList<Branch>)ViewBag.Branches; var all = (Dictionary<int, Branch>)ViewBag.AllBranches; var history = (IReadOnlyList<Library.Core.Models.ImportBatch>)ViewBag.History;
+   var provider = (IExternalCatalogueProvider)ViewBag.Provider; int? here = (int?)ViewBag.Here; }
+<h1>Import items</h1>
+<p class="muted">Add many items at once from a CSV file or from an external catalogue. Every row is checked first and you review the result before anything is added.</p>
+<div class="grid grid-2">
+  <div class="card">
+    <h2>From a CSV file</h2>
+    <form method="post" asp-antiforgery="true" action="/admin/import/upload" enctype="multipart/form-data">
+      <label for="file">CSV file (max @ViewBag.MaxMb MB)</label>
+      <input id="file" name="file" type="file" accept=".csv,text/csv" required />
+      <label for="branchId">Add the items to this branch</label>
+      <select id="branchId" name="branchId">@foreach (var b in branches) { <option value="@b.Id" selected="@(b.Id == here)">@b.Name</option> }</select>
+      <p class="field-hint">A row can name its own branch in a <code>branch</code> column; otherwise this one is used.</p>
+      <p><button class="btn" type="submit">Check the file</button> <a class="btn btn-ghost" href="/admin/import/template.csv">Download a template</a></p>
+    </form>
+    <details class="small"><summary>Columns</summary>
+      <p><code>type</code> (book, music, toy), <code>code</code>, <code>name</code>, <code>description</code>, <code>branch</code>, <code>category</code>, <code>author</code> (books), <code>artist</code> and <code>year</code> (music), <code>age</code> (toys).</p></details>
+  </div>
+  <div class="card">
+    <h2>From an external catalogue</h2>
+    <p><strong>@provider.Name</strong><br />@provider.Description</p>
+    <form method="post" asp-antiforgery="true" action="/admin/import/provider">
+      <label for="pbranch">Add the items to this branch</label>
+      <select id="pbranch" name="branchId">@foreach (var b in branches) { <option value="@b.Id" selected="@(b.Id == here)">@b.Name</option> }</select>
+      <p style="margin-top:1rem"><button class="btn" type="submit">Fetch and check</button></p>
+    </form>
+  </div>
+</div>
+<h2>Import history</h2>
+<div class="table-wrap"><table class="table stack">
+  <thead><tr><th>When</th><th>Source</th><th>Branch</th><th>By</th><th class="num">Rows</th><th class="num">Imported</th><th class="num">Skipped</th></tr></thead>
+  <tbody>
+  @foreach (var b in history)
+  {
+    <tr><td data-label="When">@Fmt.DateTime_(b.ImportedAt)</td><td data-label="Source">@b.Source</td><td data-label="Branch">@(all.TryGetValue(b.BranchId, out var br) ? br.Name : "?")</td><td data-label="By">@b.ImportedBy</td>
+        <td class="num" data-label="Rows">@b.TotalRows</td><td class="num" data-label="Imported">@b.ImportedRows</td><td class="num" data-label="Skipped">@b.SkippedRows</td></tr>
+    @if (b.Problems.Count > 0)
+    {
+      <tr><td colspan="7"><details><summary class="small">@Fmt.Plural(b.Problems.Count, "problem", "problems")</summary><ul class="small">@foreach (var p in b.Problems) { <li>@p</li> }</ul></details></td></tr>
+    }
+  }
+  </tbody></table>
+  @if (history.Count == 0) { <div class="empty">Nothing has been imported yet.</div> }
+</div>

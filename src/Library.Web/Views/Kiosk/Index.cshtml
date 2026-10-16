@@ -1,0 +1,29 @@
+@model PatronLoginForm
+@{ ViewData["Title"] = "Welcome"; }
+<div class="card">
+  <h1>Welcome</h1>
+  <p>Scan or type your <strong>library card number</strong>, then enter your <strong>PIN</strong>.</p>
+  <form method="post" asp-antiforgery="true" action="/kiosk/signin" autocomplete="off">
+    <label for="CardNumber">Card number</label>
+    <input id="CardNumber" name="CardNumber" type="text" value="@Model.CardNumber" placeholder="LIB-1001" autofocus required />
+    <label for="Pin">PIN</label>
+    <input id="Pin" name="Pin" type="password" inputmode="numeric" maxlength="8" required />
+    <div class="pinpad" aria-label="PIN pad">
+      @foreach (var k in new[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "C", "0", "&larr;" })
+      {
+        <button type="button" data-key="@k">@Html.Raw(k)</button>
+      }
+    </div>
+    <button class="btn" type="submit">Sign in</button>
+  </form>
+</div>
+<p class="muted">No card yet? Ask at the desk. Forgotten your PIN? A librarian can reset it.</p>
+<script>
+  document.querySelectorAll('.pinpad button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var pin = document.getElementById('Pin'), k = b.getAttribute('data-key');
+      if (k === 'C') pin.value = ''; else if (k === '←') pin.value = pin.value.slice(0, -1); else if (pin.value.length < 8) pin.value += k;
+      pin.focus();
+    });
+  });
+</script>

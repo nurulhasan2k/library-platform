@@ -1,0 +1,45 @@
+@model IReadOnlyList<TransferInfo>
+@{ ViewData["Title"] = "Transfers"; var branches = (Dictionary<int, Branch>)ViewBag.Branches; var active = (IReadOnlyList<Branch>)ViewBag.Active; var canChange = (bool)ViewBag.CanChange; int? here = (int?)ViewBag.Here; var isAdmin = User.IsInRole("Admin"); }
+<div class="page-head"><h1>Transfers between branches</h1><a class="btn btn-ghost" href="/transfers?history=@(!(bool)ViewBag.History)">@((bool)ViewBag.History ? "Show only active" : "Show history")</a></div>
+<p class="muted">An item moves <strong>Requested &rarr; In transit &rarr; Received</strong>. While a transfer is active the item can't be borrowed. When it is received it belongs to the new branch.</p>
+@if (canChange)
+{
+  <div class="card">
+    <h2>Request a transfer</h2>
+    <form method="post" asp-antiforgery="true" action="/transfers/request" class="filters">
+      <div><label for="code">Item library code</label><input id="code" name="code" type="text" required placeholder="BK-032" /></div>
+      <div><label for="to">Send to</label><select id="to" name="toBranchId">@foreach (var b in active) { <option value="@b.Id" selected="@(b.Id == here)">@b.Name</option> }</select></div>
+      <div class="grow"><label for="note">Note (optional)</label><input id="note" name="note" type="text" maxlength="200" placeholder="e.g. for a patron" /></div>
+      <div><button class="btn" type="submit">Request</button></div>
+    </form>
+  </div>
+}
+<div class="table-wrap"><table class="table stack">
+  <thead><tr><th>Item</th><th>From</th><th>To</th><th>Status</th><th>Requested</th><th>Note</th><th></th></tr></thead>
+  <tbody>
+  @foreach (var t in Model)
+  {
+    var mayFrom = isAdmin || here == t.FromBranchId; var mayTo = isAdmin || here == t.ToBranchId;
+    <tr>
+      <td data-label="Item">@t.ItemName <span class="muted">(@t.LibraryCode)</span></td>
+      <td data-label="From">@branches[t.FromBranchId].Name</td><td data-label="To">@branches[t.ToBranchId].Name</td>
+      <td data-label="Status"><span class="badge @(t.Status switch { TransferStatus.Requested => "info", TransferStatus.InTransit => "warn", TransferStatus.Received => "ok", _ => "mute" })">@t.Status</span>
+        @if (t.DispatchedAt is { } dt && t.Status == TransferStatus.InTransit) { <span class="small muted">sent @Fmt.Date(dt)</span> }
+        @if (t.ReceivedAt is { } rt) { <span class="small muted">@Fmt.Date(rt)</span> }</td>
+      <td data-label="Requested">@Fmt.Date(t.RequestedAt)</td><td data-label="Note">@t.Note</td>
+      <td class="right nowrap">
+        @if (canChange && t.Status == TransferStatus.Requested)
+        {
+          if (mayFrom) { <form method="post" asp-antiforgery="true" action="/transfers/@t.Id/dispatch" class="inline"><button class="btn btn-sm" type="submit">Dispatch</button></form> }
+          if (mayFrom || mayTo) { <form method="post" asp-antiforgery="true" action="/transfers/@t.Id/cancel" class="inline"><button class="btn btn-sm btn-ghost" type="submit">Cancel</button></form> }
+        }
+        @if (canChange && t.Status == TransferStatus.InTransit && mayTo)
+        {
+          <form method="post" asp-antiforgery="true" action="/transfers/@t.Id/receive" class="inline"><button class="btn btn-sm btn-ok" type="submit">Receive</button></form>
+        }
+      </td>
+    </tr>
+  }
+  </tbody></table>
+  @if (Model.Count == 0) { <div class="empty">No transfers.</div> }
+</div>

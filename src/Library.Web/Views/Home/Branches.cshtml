@@ -1,0 +1,22 @@
+@model BranchesPage
+@{ ViewData["Title"] = "Branches and opening hours"; var today = Model.Now.DayOfWeek; }
+<h1>Branches and opening hours</h1>
+<div class="grid grid-3">
+@foreach (var b in Model.Branches)
+{
+  var todayHours = b.Hours.FirstOrDefault(h => h.Day == today);
+  var open = todayHours is { IsClosed: false } && TimeOnly.FromDateTime(Model.Now) >= todayHours.Open && TimeOnly.FromDateTime(Model.Now) < todayHours.Close;
+  <div class="card">
+    <h2>@b.Name</h2>
+    <p class="muted">@b.Address<br />@b.Phone</p>
+    <p><span class="badge @(open ? "ok" : "mute")">@(open ? "Open now" : "Closed now")</span></p>
+    <table class="table">
+      @foreach (var h in b.Hours)
+      {
+        <tr class="@(h.Day == today ? "row-warn" : "")"><td>@h.Day</td><td class="right">@Fmt.Hours(h)</td></tr>
+      }
+    </table>
+    <p style="margin-top:.6rem"><a href="/?branch=@b.Id">Browse this branch</a></p>
+  </div>
+}
+</div>

@@ -1,0 +1,75 @@
+@{ ViewData["Title"] = "API documentation"; }
+<h1>Public API</h1>
+<p>A read-only REST API for the catalogue, categories, branches and opening hours. Responses are JSON. The machine-readable description is at <a href="/api/openapi.json">/api/openapi.json</a> (OpenAPI 3).</p>
+<div class="card">
+  <h2>Try it</h2>
+  <div class="form-row">
+    <div><label for="key">API key (sent as <code>X-Api-Key</code>)</label><input id="key" type="text" autocomplete="off" placeholder="the value of Api:Key" /></div>
+    <div><label for="path">Request</label><select id="path"></select></div>
+  </div>
+  <div id="params" class="form-row"></div>
+  <p><button class="btn" id="send" type="button">Send GET request</button> <span id="status" class="muted"></span></p>
+  <pre><code id="out">Choose a request and press Send.</code></pre>
+</div>
+<div id="endpoints"></div>
+<h2>Rules</h2>
+<ul>
+  <li><strong>Read-only.</strong> Only GET, HEAD and OPTIONS are accepted. POST, PUT, PATCH and DELETE return <code>405</code>.</li>
+  <li><strong>API key.</strong> No key: <code>401</code>. Wrong key: <code>403</code>.</li>
+  <li><strong>Rate limit.</strong> Too many requests in a minute: <code>429</code> with a <code>Retry-After</code> header.</li>
+  <li><strong>Privacy.</strong> Borrowers, loans, fines and destroyed items are never included.</li>
+  <li><strong>Errors</strong> look like <code>{"error":{"code":"not_found","message":"...","status":404}}</code>.</li>
+</ul>
+<h2>curl examples</h2>
+<pre><code>curl -H "X-Api-Key: YOUR_KEY" "@($"{Context.Request.Scheme}://{Context.Request.Host}")/api/v1/items?q=dune&amp;branch=CENTRAL"
+curl -H "X-Api-Key: YOUR_KEY" "@($"{Context.Request.Scheme}://{Context.Request.Host}")/api/v1/items/BK-001"
+curl -H "X-Api-Key: YOUR_KEY" "@($"{Context.Request.Scheme}://{Context.Request.Host}")/api/v1/branches"
+curl -X POST -i -H "X-Api-Key: YOUR_KEY" "@($"{Context.Request.Scheme}://{Context.Request.Host}")/api/v1/items"   # 405 Method Not Allowed</code></pre>
+@section Scripts {
+<script>
+(function () {
+  var spec, sel = document.getElementById('path'), params = document.getElementById('params');
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  fetch('/api/openapi.json').then(function (r) { return r.json(); }).then(function (s) {
+    spec = s; var html = '';
+    Object.keys(s.paths).forEach(function (p) {
+      var op = s.paths[p].get, o = document.createElement('option'); o.value = p; o.textContent = 'GET ' + p; sel.appendChild(o);
+      html += '<details class="endpoint"><summary><span class="method">GET</span> <code>' + esc(p) + '</code> <span class="muted">' + esc(op.summary) + '</span></summary><div class="body">';
+      if (op.parameters.length) {
+        html += '<table class="table"><tr><th>Parameter</th><th>In</th><th>Description</th></tr>';
+        op.parameters.forEach(function (q) { html += '<tr><td><code>' + esc(q.name) + '</code>' + (q.required ? ' *' : '') + '</td><td>' + esc(q.in) + '</td><td>' + esc(q.description) + '</td></tr>'; });
+        html += '</table>';
+      }
+      html += '<p>Responses: ' + Object.keys(op.responses).map(function (c) { return '<code>' + c + '</code> ' + esc(op.responses[c].description); }).join(' &middot; ') + '</p></div></details>';
+    });
+    document.getElementById('endpoints').innerHTML = '<h2>Endpoints</h2>' + html;
+    renderParams();
+  });
+  function renderParams() {
+    var op = spec.paths[sel.value].get; params.innerHTML = '';
+    op.parameters.forEach(function (q) {
+      var d = document.createElement('div');
+      d.innerHTML = '<label>' + esc(q.name) + (q.required ? ' *' : '') + '</label><input type="text" data-name="' + esc(q.name) + '" data-in="' + esc(q.in) + '" value="' + esc(q.example) + '" placeholder="' + esc(q.description) + '">';
+      params.appendChild(d);
+    });
+  }
+  sel.addEventListener('change', renderParams);
+  document.getElementById('send').addEventListener('click', function () {
+    var url = sel.value, qs = [];
+    params.querySelectorAll('input').forEach(function (i) {
+      if (!i.value) return;
+      if (i.getAttribute('data-in') === 'path') url = url.replace('{' + i.getAttribute('data-name') + '}', encodeURIComponent(i.value));
+      else qs.push(encodeURIComponent(i.getAttribute('data-name')) + '=' + encodeURIComponent(i.value));
+    });
+    if (qs.length) url += '?' + qs.join('&');
+    var out = document.getElementById('out'), st = document.getElementById('status');
+    st.textContent = 'Sending...';
+    fetch(url, { headers: { 'X-Api-Key': document.getElementById('key').value } }).then(function (r) {
+      st.textContent = r.status + ' ' + r.statusText;
+      return r.text();
+    }).then(function (t) { try { out.textContent = JSON.stringify(JSON.parse(t), null, 2); } catch (e) { out.textContent = t; } })
+      .catch(function (e) { st.textContent = 'Failed'; out.textContent = String(e); });
+  });
+})();
+</script>
+}

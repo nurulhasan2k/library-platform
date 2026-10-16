@@ -1,0 +1,16 @@
+@model AccountSummary
+@{ ViewData["Title"] = Model.Name; ViewData["CancelAction"] = "/holds/cancel"; }
+<div class="page-head">
+  <div><h1>@Model.Name</h1><p class="muted">Card <code>@Model.CardNumber</code> &middot; notifications by @Model.PreferredChannel</p></div>
+  <div class="actions">
+    <a class="btn btn-ghost" href="/borrowers/@Model.BorrowerId/edit">Edit</a>
+    <form method="post" asp-antiforgery="true" action="/borrowers/@Model.BorrowerId/reset-pin" onsubmit="return confirm('Create a new PIN for this patron? The old PIN will stop working.')"><button class="btn btn-ghost" type="submit">Reset PIN</button></form>
+    <form method="post" asp-antiforgery="true" action="/borrowers/@Model.BorrowerId/delete" onsubmit="return confirm('Delete this borrower?')"><button class="btn btn-danger" type="submit">Delete</button></form>
+  </div>
+</div>
+@if (TempData["NewPin"] is string pin)
+{
+  <div class="flash flash-info" role="status"><strong>Give the patron these details now &mdash; the PIN is shown only once:</strong><br />
+    Card number <code>@TempData["NewCard"]</code> &nbsp; PIN <code style="font-size:1.2rem">@pin</code></div>
+}
+@await Html.PartialAsync("_AccountSummary", Model)

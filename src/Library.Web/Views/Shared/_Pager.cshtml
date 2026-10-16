@@ -1,0 +1,9 @@
+@model Library.Web.Models.PagerModel
+@if (Model.TotalPages > 1)
+{
+  <nav class="pager" aria-label="Pages">
+    @if (Model.Page > 1) { <a href="@Model.Url(Model.Page - 1)" rel="prev">&larr; Previous</a> }
+    <span>Page @Model.Page of @Model.TotalPages (@Model.Total results)</span>
+    @if (Model.Page < Model.TotalPages) { <a href="@Model.Url(Model.Page + 1)" rel="next">Next &rarr;</a> }
+  </nav>
+}

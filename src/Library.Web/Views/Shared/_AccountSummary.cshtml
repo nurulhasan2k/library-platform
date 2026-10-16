@@ -1,0 +1,68 @@
+@model AccountSummary
+@* Used by the web account and the kiosk (same numbers, different layout). Staff see it on the borrower page too. *@
+@if (Model.TotalOwing > 0)
+{
+  <div class="flash flash-warn">
+    <strong>Fines: @Fmt.Money(Model.TotalOwing)</strong>
+    @if (Model.UnpaidFines > 0) { <text> &mdash; @Fmt.Money(Model.UnpaidFines) to pay at a desk</text> }
+    @if (Model.AccruingFines > 0) { <text>, @Fmt.Money(Model.AccruingFines) building up on overdue items</text> }
+  </div>
+}
+<div class="card">
+  <h2>Items on loan (@Model.ActiveLoans.Count)</h2>
+  @if (Model.ActiveLoans.Count == 0) { <p class="muted">You have nothing on loan.</p> }
+  else
+  {
+    <div class="table-wrap"><table class="table stack">
+      <thead><tr><th>Item</th><th>Borrowed</th><th>Due back</th><th class="num">Fine so far</th></tr></thead>
+      <tbody>
+      @foreach (var l in Model.ActiveLoans)
+      {
+        <tr class="@(l.IsOverdue ? "row-bad" : "")">
+          <td data-label="Item"><strong>@l.ItemName</strong> <span class="muted">(@l.LibraryCode)</span></td>
+          <td data-label="Borrowed">@Fmt.Date(l.Loan.BorrowedOn)</td>
+          <td data-label="Due back">@Fmt.Date(l.Loan.DueOn) @if (l.IsOverdue) { <span class="badge bad">@l.DaysLate days late</span> }</td>
+          <td class="num" data-label="Fine so far">@(l.Fine > 0 ? Fmt.Money(l.Fine) : "-")</td>
+        </tr>
+      }
+      </tbody></table></div>
+  }
+</div>
+<div class="card">
+  <h2>My holds (@Model.Holds.Count)</h2>
+  @if (Model.Holds.Count == 0) { <p class="muted">You have no holds.</p> }
+  else
+  {
+    <div class="table-wrap"><table class="table stack">
+      <thead><tr><th>Item</th><th>Where</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+      @foreach (var h in Model.Holds)
+      {
+        <tr>
+          <td data-label="Item"><a href="/items/@h.LibraryCode">@h.ItemName</a></td>
+          <td data-label="Where">@h.BranchName</td>
+          <td data-label="Status">
+            @if (h.Status == ReservationStatus.Ready) { <span class="badge ok">Ready to collect</span> <span class="small muted">until @(h.ExpiresAt is { } e ? Fmt.Date(e) : "")</span> }
+            else { <span class="badge info">Waiting &mdash; place @h.Position of @h.QueueLength</span> }
+          </td>
+          <td class="right"><form method="post" asp-antiforgery="true" action="@(ViewData["CancelAction"] ?? "/account/cancel-hold")"><input type="hidden" name="id" value="@h.ReservationId" /><button class="btn btn-ghost btn-sm" type="submit">Cancel</button></form></td>
+        </tr>
+      }
+      </tbody></table></div>
+  }
+</div>
+@if (Model.RecentHistory.Count > 0)
+{
+  <div class="card">
+    <h2>Recently returned</h2>
+    <div class="table-wrap"><table class="table stack">
+      <thead><tr><th>Item</th><th>Returned</th><th class="num">Fine</th></tr></thead>
+      <tbody>
+      @foreach (var l in Model.RecentHistory)
+      {
+        <tr><td data-label="Item">@l.ItemName</td><td data-label="Returned">@Fmt.Date(l.Loan.ReturnedOn)</td>
+            <td class="num" data-label="Fine">@if (l.Loan.FineAmount > 0) { @Fmt.Money(l.Loan.FineAmount) <span class="badge @(l.Loan.FinePaid ? "ok" : "bad")">@(l.Loan.FinePaid ? "paid" : "unpaid")</span> } else { <text>-</text> }</td></tr>
+      }
+      </tbody></table></div>
+  </div>
+}

@@ -1,0 +1,76 @@
+@model StaffDashboard
+@{ ViewData["Title"] = "Dashboard"; }
+<div class="page-head">
+  <div>
+    <h1>Dashboard</h1>
+    <p class="muted">
+      Today is <strong>@Fmt.Date(Model.Today)</strong>@if (Model.Simulated) { <span class="badge warn" title="An administrator has set a simulated date">simulated date</span> }
+      @if (Model.Branch != null) { <text> &middot; Working at <strong>@Model.Branch.Name</strong> (<a href="/staff/branch">change</a>)</text> }
+      else if (User.IsInRole("Admin") || User.IsInRole("Reception")) { <text> &middot; <a href="/staff/branch">Choose a branch</a></text> }
+    </p>
+  </div>
+  <div class="actions">
+    @if (!User.IsInRole("Manager")) { <a class="btn" href="/desk">Open the desk</a> }
+    @if (User.IsInRole("Manager") || User.IsInRole("Admin")) { <a class="btn btn-ghost" href="/reports">Reports</a> }
+  </div>
+</div>
+
+<div class="grid grid-4">
+  <div class="stat"><div class="num">@Model.ActiveLoans</div><div class="label">Items out on loan@(Model.Branch != null ? " (this branch)" : "")</div></div>
+  <div class="stat"><div class="num">@Model.Overdue.Count</div><div class="label">Overdue loans shown</div></div>
+  <div class="stat"><div class="num">@Model.Inbound.Count</div><div class="label">Transfers arriving</div></div>
+  <div class="stat"><div class="num">@Model.NotificationsToday</div><div class="label">Notifications today</div></div>
+</div>
+
+<div class="grid grid-2" style="margin-top:1rem">
+  <div class="card">
+    <h2>Overdue loans</h2>
+    @if (Model.Overdue.Count == 0) { <p class="muted">Nothing is overdue.</p> }
+    else
+    {
+      <div class="table-wrap"><table class="table stack">
+        <thead><tr><th>Item</th><th>Borrower</th><th>Due</th><th class="num">Fine so far</th></tr></thead>
+        <tbody>
+        @foreach (var l in Model.Overdue)
+        {
+          <tr><td data-label="Item">@l.ItemName <span class="muted">(@l.LibraryCode)</span></td><td data-label="Borrower">@l.BorrowerName</td>
+              <td data-label="Due">@Fmt.Date(l.Loan.DueOn) <span class="badge bad">@l.DaysLate d late</span></td><td class="num" data-label="Fine">@Fmt.Money(l.Fine)</td></tr>
+        }
+        </tbody></table></div>
+    }
+    <a href="/desk/loans?overdue=true">See all overdue loans</a>
+  </div>
+  <div class="card">
+    <h2>Holds ready to collect</h2>
+    @if (Model.ReadyHolds.Count == 0) { <p class="muted">No holds are waiting for collection.</p> }
+    else
+    {
+      <ul>
+      @foreach (var h in Model.ReadyHolds)
+      {
+        <li>@h.ItemName (@h.LibraryCode) for <strong>@h.BorrowerName</strong>, until @(h.ExpiresAt is { } e ? Fmt.Date(e) : "-")</li>
+      }
+      </ul>
+    }
+    <a href="/holds">See all holds</a>
+  </div>
+</div>
+
+<div class="card">
+  <h2>@(Model.Branch != null ? "Transfers for this branch" : "Items in transit")</h2>
+  @if (Model.Inbound.Count == 0 && Model.Outbound.Count == 0) { <p class="muted">No transfers in progress.</p> }
+  else
+  {
+    <div class="table-wrap"><table class="table stack">
+      <thead><tr><th>Item</th><th>From</th><th>To</th><th>Status</th></tr></thead>
+      <tbody>
+      @foreach (var t in Model.Inbound.Concat(Model.Outbound).DistinctBy(t => t.Id))
+      {
+        <tr><td data-label="Item">@t.ItemName <span class="muted">(@t.LibraryCode)</span></td>
+            <td data-label="From">@Model.Branches[t.FromBranchId].Name</td><td data-label="To">@Model.Branches[t.ToBranchId].Name</td>
+            <td data-label="Status"><span class="badge @(t.Status == TransferStatus.InTransit ? "warn" : "info")">@t.Status</span></td></tr>
+      }
+      </tbody></table></div>
+  }
+  <a href="/transfers">Manage transfers</a>
+</div>

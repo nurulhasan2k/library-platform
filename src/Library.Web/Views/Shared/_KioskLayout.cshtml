@@ -1,0 +1,51 @@
+@inject WebBranchContext BranchCtx
+@{
+    var signedIn = (await Context.AuthenticateAsync("Kiosk")).Succeeded;
+    var seconds = (int)(ViewData["IdleSeconds"] ?? 60);
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>@ViewData["Title"] - Self-service kiosk</title>
+  <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="kiosk">
+  <header class="kiosk-header">
+    <span class="kiosk-brand">@(BranchCtx.CurrentBranch?.Name ?? "Library")</span>
+    <span class="kiosk-title">Self-service kiosk</span>
+    @if (signedIn)
+    {
+      <span class="kiosk-timer" id="timer" aria-live="off"></span>
+      <form method="post" asp-antiforgery="true" action="/kiosk/signout" class="inline"><button class="btn btn-ghost btn-sm" type="submit">Sign out</button></form>
+    }
+  </header>
+  <main class="kiosk-main">
+    @await Html.PartialAsync("_Flash")
+    @RenderBody()
+  </main>
+  @if (signedIn)
+  {
+    <script>
+      // Signs the patron out after a period of no activity, so the next person never sees the previous account.
+      (function () {
+        var limit = @seconds, left = limit, t = document.getElementById('timer');
+        function reset() { left = limit; draw(); }
+        function draw() { if (t) t.textContent = 'Auto sign-out in ' + left + 's'; }
+        ['click', 'keydown', 'touchstart', 'mousemove'].forEach(function (e) { document.addEventListener(e, reset, { passive: true }); });
+        draw();
+        setInterval(function () {
+          left--; draw();
+          if (left <= 0) {
+            var f = document.createElement('form'); f.method = 'post'; f.action = '/kiosk/signout?idle=1';
+            var tok = document.querySelector('input[name=__RequestVerificationToken]');
+            if (tok) { var i = document.createElement('input'); i.type = 'hidden'; i.name = '__RequestVerificationToken'; i.value = tok.value; f.appendChild(i); }
+            document.body.appendChild(f); f.submit();
+          }
+        }, 1000);
+      })();
+    </script>
+  }
+</body>
+</html>

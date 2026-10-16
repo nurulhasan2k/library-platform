@@ -1,0 +1,21 @@
+type,code,name,description,branch,category,author,artist,year,age
+book,BK-501,The Left Hand of Darkness,Ursula K. Le Guin,RIVER,Science Fiction,Ursula K. Le Guin,,,
+book,BK-502,Piranesi,A strange house of statues and tides,RIVER,Fantasy,Susanna Clarke,,,
+book,BK-503,The Hitchhiker's Guide to the Galaxy,,RIVER,Science Fiction,Douglas Adams,,,
+book,BK-504,Sapiens,A brief history of humankind,RIVER,History,Yuval Noah Harari,,,
+book,BK-505,The Phoenix Project,,RIVER,Programming,Gene Kim,,,
+book,BK-506,Refactoring,Improving the design of existing code,RIVER,Programming,Martin Fowler,,,
+book,BK-507,A Wizard of Earthsea,,RIVER,Fantasy,Ursula K. Le Guin,,,
+book,BK-508,"Guns, Germs, and Steel",,RIVER,History,Jared Diamond,,,
+music,MU-501,Blue Train,,RIVER,Jazz,,John Coltrane,1958,
+music,MU-502,Kind of Blue,,RIVER,Jazz,,Miles Davis,1959,
+music,MU-503,Abbey Road,,RIVER,Rock,,The Beatles,1969,
+music,MU-504,Rumours (CD copy),,RIVER,Rock,,Fleetwood Mac,1977,
+music,MU-505,Symphony No. 5,,RIVER,Classical,,Beethoven,1808,
+music,MU-506,The Planets,,RIVER,Classical,,Gustav Holst,1918,
+toy,TY-501,500-piece coastline puzzle,,RIVER,Puzzle,,,,8
+toy,TY-502,Magnetic tiles set,,RIVER,Building,,,,3
+toy,TY-503,Wooden train set,,RIVER,Building,,,,3
+toy,TY-504,Chess set,,RIVER,Puzzle,,,,7
+toy,TY-505,Marble run,,RIVER,Building,,,,6
+toy,TY-506,Jigsaw: world map,,RIVER,Puzzle,,,,10

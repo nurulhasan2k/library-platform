@@ -1,0 +1,48 @@
+@model BranchChoice
+@{ ViewData["Title"] = "Choose a branch"; }
+<div class="card form">
+  <h1>Which branch are you working at?</h1>
+  <p class="muted">Lending, returns and transfers apply to the branch you choose. You can change it at any time from the top bar.</p>
+  @if (Model.Branches.Count == 0)
+  {
+    <div class="flash flash-bad">Your account isn't allowed to work at any branch. Ask an administrator.</div>
+  }
+  else
+  {
+    <form method="post" asp-antiforgery="true" action="/staff/branch">
+      <input type="hidden" name="ReturnUrl" value="@Model.ReturnUrl" />
+      <label for="BranchId">Branch</label>
+      <select id="BranchId" name="BranchId" onchange="showDesks()">
+        @foreach (var b in Model.Branches)
+        {
+          <option value="@b.Id" selected="@(b.Id == Model.BranchId)">@b.Name (@b.Code)</option>
+        }
+      </select>
+      <label for="DeskId">Reception desk</label>
+      <select id="DeskId" name="DeskId">
+        @foreach (var b in Model.Branches)
+        {
+          foreach (var d in b.Desks)
+          {
+            <option value="@d.Id" data-branch="@b.Id" selected="@(d.Id == Model.DeskId)">@d.Name</option>
+          }
+        }
+      </select>
+      <p style="margin-top:1rem"><button class="btn" type="submit">Start working here</button></p>
+    </form>
+  }
+</div>
+@section Scripts {
+  <script>
+    function showDesks() {
+      var b = document.getElementById('BranchId').value, d = document.getElementById('DeskId'), first = null;
+      for (var i = 0; i < d.options.length; i++) {
+        var o = d.options[i], match = o.getAttribute('data-branch') === b;
+        o.hidden = !match; o.disabled = !match;
+        if (match && first === null) first = o;
+      }
+      if (d.options[d.selectedIndex].disabled && first) first.selected = true;
+    }
+    showDesks();
+  </script>
+}

@@ -1,0 +1,9 @@
+@model AccountSummary
+@{ ViewData["Title"] = "My account"; ViewData["CancelAction"] = "/kiosk/holds/cancel"; }
+<h1>Hello, @Model.Name</h1>
+<div class="tile-row">
+  <a class="tile" href="/kiosk/checkout">Check out items<small>Scan the code on each item</small></a>
+  <a class="tile" href="/kiosk/holds">My holds<small>@Model.Holds.Count on your account</small></a>
+  <form method="post" asp-antiforgery="true" action="/kiosk/signout"><button class="tile" style="width:100%" type="submit">Finish &amp; sign out<small>Please remember your items</small></button></form>
+</div>
+@await Html.PartialAsync("_AccountSummary", Model)

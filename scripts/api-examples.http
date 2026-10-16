@@ -1,0 +1,37 @@
+### Works with the VS Code "REST Client" extension or the JetBrains HTTP client.
+@base = http://localhost:5080
+@key = demo-api-key-2026
+
+### Status
+GET {{base}}/api/v1/status
+X-Api-Key: {{key}}
+
+### Items (paged); filters: q, type (book|music|toy), categoryId, branch (code), availableOnly, page, pageSize
+GET {{base}}/api/v1/items?q=dune&type=book&availableOnly=true
+X-Api-Key: {{key}}
+
+### One item by library code
+GET {{base}}/api/v1/items/BK-001
+X-Api-Key: {{key}}
+
+### Categories
+GET {{base}}/api/v1/categories
+X-Api-Key: {{key}}
+
+### Branches and opening hours
+GET {{base}}/api/v1/branches
+X-Api-Key: {{key}}
+
+### Branch by code
+GET {{base}}/api/v1/branches/CENTRAL
+X-Api-Key: {{key}}
+
+### OpenAPI description (no key needed)
+GET {{base}}/api/openapi.json
+
+### Expect 401 (no key)
+GET {{base}}/api/v1/items
+
+### Expect 405 (read-only API)
+POST {{base}}/api/v1/items
+X-Api-Key: {{key}}

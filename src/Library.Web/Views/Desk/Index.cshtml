@@ -1,0 +1,64 @@
+@model DeskPage
+@{ ViewData["Title"] = "Desk"; }
+<div class="page-head">
+  <div><h1>Desk &mdash; @Model.Branch.Name</h1><p class="muted">@(Model.DeskName ?? "Reception") &middot; <a href="/staff/branch">change branch or desk</a></p></div>
+  <div class="actions"><a class="btn btn-ghost" href="/desk/loans">All loans</a><a class="btn btn-ghost" href="/borrowers/new">New borrower</a></div>
+</div>
+
+<div class="desk-grid">
+  <div class="card">
+    <h2>Lend an item</h2>
+    <form method="post" asp-antiforgery="true" action="/desk/borrow">
+      <label for="borrower">Borrower (card number or name)</label>
+      <input id="borrower" name="borrower" list="borrower-list" class="big-input" type="text" autocomplete="off" required
+             value="@(Model.LastBorrowerId is { } lb ? Model.Borrowers.FirstOrDefault(b => b.Id == lb)?.CardNumber : "")" />
+      <datalist id="borrower-list">
+        @foreach (var b in Model.Borrowers) { <option value="@b.Name (@b.CardNumber)"></option> }
+      </datalist>
+      <label for="code">Item library code</label>
+      <input id="code" name="code" class="big-input" type="text" value="@Model.LastBorrowCode" placeholder="BK-001" autocomplete="off" required />
+      <p class="field-hint">Loans are @(14) days. The item must be at this branch.</p>
+      <p><button class="btn" type="submit">Lend item</button></p>
+    </form>
+  </div>
+  <div class="card">
+    <h2>Take an item back</h2>
+    <form method="post" asp-antiforgery="true" action="/desk/return">
+      <label for="rcode">Item library code</label>
+      <input id="rcode" name="code" class="big-input" type="text" placeholder="BK-001" autocomplete="off" required />
+      <label class="check"><input type="checkbox" name="damaged" value="true" /> It came back damaged</label>
+      <p class="field-hint">Late items are fined $0.50 for each full day. An item returned here becomes this branch's item.</p>
+      <p><button class="btn btn-ok" type="submit">Take item back</button></p>
+    </form>
+  </div>
+</div>
+
+<div class="grid grid-2">
+  <div class="card">
+    <h2>Latest activity here</h2>
+    @if (Model.RecentLoans.Count == 0) { <p class="muted">No loans yet.</p> }
+    else
+    {
+      <div class="table-wrap"><table class="table stack">
+        <thead><tr><th>Item</th><th>Borrower</th><th>Borrowed</th><th>Status</th></tr></thead>
+        <tbody>
+        @foreach (var l in Model.RecentLoans)
+        {
+          <tr><td data-label="Item">@l.ItemName <span class="muted">(@l.LibraryCode)</span></td><td data-label="Borrower">@l.BorrowerName</td><td data-label="Borrowed">@Fmt.Date(l.Loan.BorrowedOn)</td>
+            <td data-label="Status">@if (l.Loan.IsActive) { <span class="badge @(l.IsOverdue ? "bad" : "info")">@(l.IsOverdue ? "overdue" : "out until " + l.Loan.DueOn.ToString("d MMM"))</span> } else { <span class="badge mute">returned</span> }</td></tr>
+        }
+        </tbody></table></div>
+    }
+  </div>
+  <div class="card">
+    <h2>Overdue at this branch</h2>
+    @if (Model.Overdue.Count == 0) { <p class="muted">Nothing overdue.</p> }
+    else
+    {
+      <ul>
+      @foreach (var l in Model.Overdue) { <li><strong>@l.BorrowerName</strong> &mdash; @l.ItemName, @l.DaysLate days late (@Fmt.Money(l.Fine))</li> }
+      </ul>
+    }
+    <a href="/desk/loans?overdue=true">See all overdue loans</a>
+  </div>
+</div>

@@ -1,0 +1,40 @@
+@model List<LoanDetails>
+@{ ViewData["Title"] = "Loans"; string Qs(int p) => $"?q={Uri.EscapeDataString((string?)ViewBag.Q ?? "")}&overdue={ViewBag.Overdue}&active={ViewBag.Active}&unpaid={ViewBag.Unpaid}&allBranches={ViewBag.All}&page={p}"; }
+<h1>Loans</h1>
+<form method="get" class="filters">
+  <div class="grow"><label for="q">Search</label><input id="q" name="q" type="search" value="@ViewBag.Q" placeholder="Item, code, borrower or card" /></div>
+  <div><label class="check"><input type="checkbox" name="active" value="true" checked="@ViewBag.Active" /> Still out</label>
+       <label class="check"><input type="checkbox" name="overdue" value="true" checked="@ViewBag.Overdue" /> Overdue</label></div>
+  <div><label class="check"><input type="checkbox" name="unpaid" value="true" checked="@ViewBag.Unpaid" /> Unpaid fines</label>
+       <label class="check"><input type="checkbox" name="allBranches" value="true" checked="@ViewBag.All" /> All branches</label></div>
+  <div><button class="btn" type="submit">Filter</button></div>
+</form>
+<p class="muted">@ViewBag.Total loans</p>
+<div class="table-wrap"><table class="table stack">
+  <thead><tr><th>Item</th><th>Borrower</th><th>Branch</th><th>Borrowed</th><th>Due</th><th>Returned</th><th class="num">Fine</th><th></th></tr></thead>
+  <tbody>
+  @foreach (var l in Model)
+  {
+    <tr class="@(l.IsOverdue ? "row-bad" : "")">
+      <td data-label="Item">@l.ItemName <span class="muted">(@l.LibraryCode)</span></td>
+      <td data-label="Borrower"><a href="/borrowers/@l.BorrowerId">@l.BorrowerName</a></td>
+      <td data-label="Branch">@l.BranchName@(l.ReturnBranchName != null && l.ReturnBranchName != l.BranchName ? " → " + l.ReturnBranchName : "") @(l.Loan.Channel == LoanChannel.Kiosk ? "(kiosk)" : "")</td>
+      <td data-label="Borrowed">@Fmt.Date(l.Loan.BorrowedOn)</td>
+      <td data-label="Due">@Fmt.Date(l.Loan.DueOn)</td>
+      <td data-label="Returned">@(l.Loan.IsActive ? "" : Fmt.Date(l.Loan.ReturnedOn))@if (l.IsOverdue) { <span class="badge bad">@l.DaysLate days late</span> }</td>
+      <td class="num" data-label="Fine">@(l.Fine > 0 ? Fmt.Money(l.Fine) : "-")@if (!l.Loan.IsActive && l.Loan.FineAmount > 0) { <br /><span class="badge @(l.Loan.FinePaid ? "ok" : "bad")">@(l.Loan.FinePaid ? "paid " + Fmt.Date(l.Loan.FinePaidOn) : "unpaid")</span> } else if (l.Loan.IsActive && l.Fine > 0) { <br /><span class="badge warn">building up</span> }</td>
+      <td class="right">@if (l.Loan.HasOutstandingFine) {
+        <form method="post" asp-antiforgery="true" action="/desk/fine-paid"><input type="hidden" name="loanId" value="@l.Loan.Id" /><input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" /><button class="btn btn-sm btn-ok" type="submit">Mark paid</button></form> }</td>
+    </tr>
+  }
+  </tbody></table>
+  @if (Model.Count == 0) { <div class="empty">No loans match.</div> }
+</div>
+@if ((int)ViewBag.Pages > 1)
+{
+  <nav class="pager">
+    @if ((int)ViewBag.Page > 1) { <a href="@Qs((int)ViewBag.Page - 1)">&larr; Previous</a> }
+    <span>Page @ViewBag.Page of @ViewBag.Pages</span>
+    @if ((int)ViewBag.Page < (int)ViewBag.Pages) { <a href="@Qs((int)ViewBag.Page + 1)">Next &rarr;</a> }
+  </nav>
+}

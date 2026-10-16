@@ -14,7 +14,7 @@ Three people work in this repository. These rules keep `main` working so nobody 
 ## Pull requests and reviews
 
 - Open a pull request for every change to `main`, using the template in `.github/`.
-- Every pull request is reviewed by one teammate before merging: **A reviews B, B reviews C, C reviews A.**
+- Every pull request is reviewed by one teammate before merging: **Mohammed reviews Rakibul, Rakibul reviews Modasser, Modasser reviews Mohammed.**
 - The author merges after approval (squash merge keeps history readable).
 - Review within one working day. If a review is blocking you, say so in the team chat.
 
@@ -26,15 +26,14 @@ Three people work in this repository. These rules keep `main` working so nobody 
 
 ## Never commit
 
-`bin/`, `obj/`, database files (`*.db`), `data/`, `appsettings.Local.json`, API keys, passwords or anything from `dotnet user-secrets`.
+`bin/`, `obj/`, the data file (`data/library.json`) and its `.lock` file, import staging files, `appsettings.Local.json`, API keys, passwords or anything from `dotnet user-secrets`.
 `.gitignore` covers most of this; check `git status` before you commit.
 
-## Database migrations (important)
+## Data changes
 
-- Person A owns the order of migrations so the history stays a single line.
-- Before creating a migration: pull `main`, apply the latest migrations, then create yours. Name it clearly (`AddReservationTable`).
-- **Never edit or delete a migration that is already on `main`.** Add a new one.
-- Tell the team in the chat when you merge a migration.
+- The data model lives in `src/Library.Core/Models` and is stored as JSON (see `docs/ER-DIAGRAM.md`). Adding a field needs a default value so older data files still load.
+- Update the seed data (`SeedRunner`) and `docs/SEED-SCENARIOS.md` when the demo data changes.
+- Run `scripts/reset-db.sh` after pulling a change to the seed data.
 
 ## Code standards
 
@@ -45,7 +44,7 @@ Three people work in this repository. These rules keep `main` working so nobody 
 - Never show a stack trace. A missing, deleted or invalid item gets a friendly message.
 - Use `IClock` for dates, never `DateTime.Now` or `DateTime.Today` in business code.
 - Public pages and the public API never expose patron, loan or fine data.
-- Add or update tests for the rules you change.
+- Add or update tests for the rules you change (`scripts/run-tests.sh` must pass).
 
 ## Settings
 
@@ -54,8 +53,8 @@ Add new settings to `appsettings.json`, to the options class in `src/Library.Cor
 
 ## Definition of done
 
-Merged to `main`, works against the seed data, validated and authorised, has unit tests for its rules,
-has its README section and user journey drafted, and has been demonstrated on the VM.
+Merged to `main`, works against the seed data, validated and authorised, has tests for its rules,
+has its README section and user guide section written, and has been demonstrated on the VM.
 
 ## Meetings
 

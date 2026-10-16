@@ -15,8 +15,9 @@ public sealed class LendingOptions
 public sealed class DatabaseOptions
 {
     public const string Section = "Database";
-    public string ConnectionString { get; set; } = "Data Source=data/library.db";
-    /// <summary>Create demo data on first start when the database is empty.</summary>
+    /// <summary>The data file. A relative path is placed next to LibraryPlatform.sln. LIBRARY_DATA_FILE overrides it.</summary>
+    public string DataFile { get; set; } = "data/library.json";
+    /// <summary>Create demo data on first start when the data file is empty.</summary>
     public bool SeedOnStartup { get; set; } = true;
 }
 
@@ -59,13 +60,16 @@ public sealed class ApiOptions
     public string Key { get; set; } = "";
     public int RateLimitPerMinute { get; set; } = 60;
     public int MaxPageSize { get; set; } = 100;
-    public bool EnableSwagger { get; set; } = true;
+    /// <summary>Serve the interactive API documentation page at /api/docs.</summary>
+    public bool EnableDocs { get; set; } = true;
 }
 
 public sealed class ImportOptions
 {
     public const string Section = "Import";
     public int MaxFileSizeMb { get; set; } = 5;
+    /// <summary>Largest number of rows accepted in one import.</summary>
+    public int MaxRows { get; set; } = 2000;
 }
 
 public sealed class ReportOptions

@@ -1,0 +1,47 @@
+@model List<Library.Core.Models.Notification>
+@{ ViewData["Title"] = "Notifications"; var isAdmin = User.IsInRole("Admin"); DateOnly today = ViewBag.Today; DateOnly? sim = ViewBag.Simulated;
+   string Qs(int p) => $"?type={ViewBag.Type}&channel={ViewBag.Channel}&q={Uri.EscapeDataString((string?)ViewBag.Q ?? "")}&allBranches={ViewBag.All}&page={p}"; }
+<div class="page-head"><h1>Notifications</h1></div>
+<p class="muted">Simulated email and SMS. Nothing is really sent: each message is stored here and written to the server console. @if ((bool)ViewBag.ScopedToBranch) { <text>Showing messages about items at your branch (<a href="?allBranches=true">show all</a>).</text> }</p>
+<div class="card">
+  <p>System date: <strong>@Fmt.Date(today)</strong> @if (sim != null) { <span class="badge warn">simulated</span> } else { <span class="badge mute">real date</span> }</p>
+  @if (isAdmin)
+  {
+    <div class="actions">
+      <form method="post" asp-antiforgery="true" action="/notifications/run"><button class="btn btn-ok" type="submit">Run checks now</button></form>
+      <form method="post" asp-antiforgery="true" action="/notifications/advance"><input type="hidden" name="days" value="1" /><button class="btn btn-ghost" type="submit">+1 day</button></form>
+      <form method="post" asp-antiforgery="true" action="/notifications/advance"><input type="hidden" name="days" value="7" /><button class="btn btn-ghost" type="submit">+7 days</button></form>
+      <form method="post" asp-antiforgery="true" action="/notifications/date" class="actions"><input type="date" name="simulatedToday" value="@today.ToString("yyyy-MM-dd")" style="width:auto" aria-label="Simulated date" /><button class="btn btn-ghost" type="submit" name="action" value="set">Set date</button>
+        <button class="btn btn-ghost" type="submit" name="action" value="clear">Use real date</button></form>
+    </div>
+    <p class="field-hint">Move the date forward, then press <em>Run checks now</em>: patrons get "due soon" notices two days before the due date and a "fine accruing" notice each day an item is overdue. The same checks run automatically once a day.</p>
+  }
+</div>
+<form method="get" class="filters">
+  <div><label for="type">Type</label><select id="type" name="type"><option value="">All</option>@foreach (var t in Enum.GetValues<NotificationType>()) { <option value="@t" selected="@(ViewBag.Type == t)">@t</option> }</select></div>
+  <div><label for="channel">Channel</label><select id="channel" name="channel"><option value="">All</option>@foreach (var c in new[] { NotificationChannel.Email, NotificationChannel.Sms }) { <option value="@c" selected="@(ViewBag.Channel == c)">@c</option> }</select></div>
+  <div class="grow"><label for="q">Search</label><input id="q" name="q" type="search" value="@ViewBag.Q" placeholder="Patron or subject" /></div>
+  <div><button class="btn" type="submit">Filter</button></div>
+</form>
+<p class="muted">@ViewBag.Total notifications</p>
+<div class="table-wrap"><table class="table stack">
+  <thead><tr><th>When</th><th>Type</th><th>Channel</th><th>To</th><th>Message</th></tr></thead>
+  <tbody>
+  @foreach (var n in Model)
+  {
+    <tr><td data-label="When" class="nowrap">@Fmt.DateTime_(n.CreatedAt)</td><td data-label="Type"><span class="badge @(n.Type switch { NotificationType.FineAccruing => "bad", NotificationType.DueSoon => "warn", NotificationType.ReservationReady => "ok", NotificationType.ReservationExpired => "mute", _ => "info" })">@n.Type</span></td>
+        <td data-label="Channel">@(n.Channel == NotificationChannel.Sms ? "SMS" : "Email")</td>
+        <td data-label="To">@n.BorrowerName<br /><span class="small muted">@n.Recipient</span></td>
+        <td data-label="Message"><strong>@n.Subject</strong><br /><span class="small">@n.Body</span></td></tr>
+  }
+  </tbody></table>
+  @if (Model.Count == 0) { <div class="empty">No notifications yet.</div> }
+</div>
+@if ((int)ViewBag.Pages > 1)
+{
+  <nav class="pager">
+    @if ((int)ViewBag.Page > 1) { <a href="@Qs((int)ViewBag.Page - 1)">&larr; Previous</a> }
+    <span>Page @ViewBag.Page of @ViewBag.Pages</span>
+    @if ((int)ViewBag.Page < (int)ViewBag.Pages) { <a href="@Qs((int)ViewBag.Page + 1)">Next &rarr;</a> }
+  </nav>
+}

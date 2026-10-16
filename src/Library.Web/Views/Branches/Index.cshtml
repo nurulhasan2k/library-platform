@@ -1,0 +1,16 @@
+@model IReadOnlyList<Branch>
+@{ ViewData["Title"] = "Branches"; var counts = (Dictionary<int, int>)ViewBag.Counts; }
+<div class="page-head"><h1>Branches</h1><a class="btn" href="/admin/branches/new">Add a branch</a></div>
+<div class="grid grid-3">
+@foreach (var b in Model)
+{
+  <div class="card">
+    <h2>@b.Name <span class="muted">(@b.Code)</span> @if (!b.IsActive) { <span class="badge mute">closed down</span> }</h2>
+    <p class="muted">@b.Address &middot; @b.Phone</p>
+    <p>@counts[b.Id] items &middot; @string.Join(", ", b.Desks.Select(d => d.Name))</p>
+    <table class="table small">@foreach (var h in b.Hours.OrderBy(h => ((int)h.Day + 6) % 7)) { <tr><td>@h.Day.ToString()[..3]</td><td>@Fmt.Hours(h)</td></tr> }</table>
+    <p style="margin-top:.6rem" class="actions"><a class="btn btn-ghost btn-sm" href="/admin/branches/@b.Id/edit">Edit</a>
+      <form method="post" asp-antiforgery="true" action="/admin/branches/@b.Id/delete" onsubmit="return confirm('Delete @b.Name?')"><button class="btn btn-danger btn-sm" type="submit">Delete</button></form></p>
+  </div>
+}
+</div>

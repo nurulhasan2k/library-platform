@@ -1,9 +1,13 @@
 using Library.Core.Configuration;
 using Library.Core.Contracts;
-using Library.Core.Stubs;
+using Library.Core.Data;
+using Library.Core.Import;
+using Library.Core.Reports;
+using Library.Core.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 
 namespace Library.Core;
 
@@ -25,20 +29,38 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Register a stub for every shared service that does not have a real implementation yet.
-    /// Uses TryAdd, so a real implementation registered BEFORE this call wins. A real
-    /// implementation registered AFTER this call also wins (last registration is the one resolved).
+    /// Registers the data store and every service. IBranchContext is NOT registered here because it depends on the web
+    /// request: the web project registers it.
     /// </summary>
-    public static IServiceCollection AddLibraryStubs(this IServiceCollection services)
+    public static IServiceCollection AddLibraryServices(this IServiceCollection services)
     {
-        services.TryAddSingleton<IClock, SystemClock>();
-        services.TryAddSingleton<IBranchContext, StubBranchContext>();
-        services.TryAddSingleton<INotificationService, StubNotificationService>();
-        services.TryAddSingleton<IReservationService, StubReservationService>();
-        services.TryAddSingleton<ICatalogueQuery, StubCatalogueQuery>();
-        services.TryAddSingleton<IPatronAuthService, StubPatronAuthService>();
-        services.TryAddSingleton<ILendingService, StubLendingService>();
-        services.TryAddSingleton<ITransferService, StubTransferService>();
+        services.TryAddSingleton(TimeProvider.System);
+        services.TryAddSingleton<ILibraryStore>(sp =>
+            new JsonLibraryStore(DataLocation.Resolve(sp.GetRequiredService<IOptions<DatabaseOptions>>().Value.DataFile)));
+        services.TryAddSingleton<IClock, SimulatedClock>();
+
+        services.AddSingleton<NotificationService>();
+        services.AddSingleton<INotificationService>(sp => sp.GetRequiredService<NotificationService>());
+        services.AddSingleton<ReservationService>();
+        services.AddSingleton<IReservationService>(sp => sp.GetRequiredService<ReservationService>());
+        services.AddSingleton<TransferService>();
+        services.AddSingleton<ITransferService>(sp => sp.GetRequiredService<TransferService>());
+        services.AddSingleton<IPatronAuthService, PatronAuthService>();
+        services.AddSingleton<ICatalogueQuery, CatalogueQuery>();
+
+        services.AddSingleton<InventoryService>();
+        services.AddSingleton<BorrowerService>();
+        services.AddSingleton<StaffService>();
+        services.AddSingleton<LoanQueryService>();
+
+        // Lending reads the current desk/kiosk from IBranchContext, which is per request.
+        services.AddScoped<LendingService>();
+        services.AddScoped<ILendingService>(sp => sp.GetRequiredService<LendingService>());
+
+        services.AddSingleton<IExternalCatalogueProvider, MockExternalProvider>();
+        services.AddSingleton<ImportService>();
+        services.AddSingleton<ReportService>();
+        services.AddSingleton<SeedRunner>();
         return services;
     }
 }
